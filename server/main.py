@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from google.adk.runners import Runner
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from google.adk.sessions.database_session_service import DatabaseSessionService
 from pydantic import BaseModel
 import uvicorn
 from google.genai import types
@@ -13,15 +14,13 @@ import urllib.parse
 from datetime import datetime
 
 from stock.agent import root_agent
-from stock.utils.tools.patch_content import patch_content
-from stock.utils.tools.update_content import update_content
-from stock.utils.database.session_service import MarketDatabaseSessionService
+
 
 # 환경변수 로드
 load_dotenv()
 
 db_path = "sqlite:///database/adk-db.sqlite"
-session_service = MarketDatabaseSessionService(db_path)
+session_service = DatabaseSessionService(db_path)
 
 APP_NAME = "geo-project"
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "geo-project-467010")
@@ -77,7 +76,7 @@ class SessionsListResponse(BaseModel):
 class SessionEventsResponse(BaseModel):
     session_id: str
     events: List[Any]  # 원본 Event 객체를 그대로 반환
-    
+
     class Config:
         arbitrary_types_allowed = True  # 커스텀 타입 허용
 
@@ -162,13 +161,12 @@ async def get_user_sessions(user_id: str):
     try:
         # URL 디코딩 처리 (google-oauth2%7C106148396882803932962 -> google-oauth2|106148396882803932962)
         decoded_user_id = urllib.parse.unquote(user_id)
-        
+
         # session_service의 편의 메서드를 사용하여 세션 리스트 가져오기
         sessions = await session_service.get_user_sessions(
-            app_name=APP_NAME,
-            user_id=decoded_user_id
+            app_name=APP_NAME, user_id=decoded_user_id
         )
-        
+
         # Session 객체들을 SessionInfo 모델로 변환
         session_infos = []
         for session in sessions:
@@ -179,21 +177,21 @@ async def get_user_sessions(user_id: str):
                     # Unix timestamp (float)를 datetime으로 변환
                     dt = datetime.fromtimestamp(session.last_update_time)
                     last_update_str = dt.isoformat()
-                elif hasattr(session.last_update_time, 'isoformat'):
+                elif hasattr(session.last_update_time, "isoformat"):
                     # 이미 datetime 객체인 경우
                     last_update_str = session.last_update_time.isoformat()
                 else:
                     # 기타 경우는 문자열로 변환
                     last_update_str = str(session.last_update_time)
-            
+
             session_info = SessionInfo(
                 session_id=session.id,
                 app_name=session.app_name,
                 user_id=session.user_id,
-                last_update_time=last_update_str
+                last_update_time=last_update_str,
             )
             session_infos.append(session_info)
-        
+
         return SessionsListResponse(sessions=session_infos)
     except Exception as e:
         print(f"Sessions list error: {str(e)}")
@@ -208,33 +206,33 @@ async def get_user_sessions(user_id: str):
         )
 
 
-@app.get("/api/v1/adk/sessions/{user_id}/{session_id}/events", response_model=SessionEventsResponse)
+@app.get(
+    "/api/v1/adk/sessions/{user_id}/{session_id}/events",
+    response_model=SessionEventsResponse,
+)
 async def get_session_events(user_id: str, session_id: str):
     """특정 세션의 모든 이벤트를 반환합니다."""
     try:
         # URL 디코딩 처리
         decoded_user_id = urllib.parse.unquote(user_id)
         decoded_session_id = urllib.parse.unquote(session_id)
-        
+
         # 세션과 이벤트들을 가져오기
         session = await session_service.get_session(
-            app_name=APP_NAME,
-            user_id=decoded_user_id,
-            session_id=decoded_session_id
+            app_name=APP_NAME, user_id=decoded_user_id, session_id=decoded_session_id
         )
-        
+
         if not session:
             raise HTTPException(
                 status_code=404,
-                detail=f"Session not found: {decoded_session_id} for user {decoded_user_id}"
+                detail=f"Session not found: {decoded_session_id} for user {decoded_user_id}",
             )
-        
+
         # 원본 Event 객체들을 그대로 반환
         return SessionEventsResponse(
-            session_id=decoded_session_id,
-            events=session.events
+            session_id=decoded_session_id, events=session.events
         )
-        
+
     except HTTPException as he:
         raise he
     except Exception as e:

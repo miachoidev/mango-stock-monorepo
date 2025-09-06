@@ -1,5 +1,5 @@
 """
-Weather MCP Tool for Marketer Agent
+Weather MCP Tool for Stock Agent
 기존 Weather MCP 서버를 연결하는 도구
 """
 

@@ -4,8 +4,8 @@ from google.adk.tools.tool_context import ToolContext
 
 from google.adk.tools import google_search
 
-from marketer.sub_agents.intent_analyzer.agent import intent_analyzer_agent
-from marketer.sub_agents.search_decision_agent.agent import search_decision_agent
+from stock.utils.agents.sub_agents.intent_analyzer import intent_analyzer_agent
+from stock.utils.agents.sub_agents.search_decision import search_decision_agent
 
 
 TREND_RESEARCH_AGENT_INSTR = """
