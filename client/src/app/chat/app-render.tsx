@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Input,
   PromptInputAction,
@@ -16,19 +16,28 @@ import { Markdown } from "@/components/ui/custom/prompt/markdown";
 import { cn } from "@/lib/utils";
 import { PromptLoader } from "@/components/ui/custom/prompt/loader";
 import { PromptScrollButton } from "@/components/ui/custom/prompt/scroll-button";
+import { sendChatMessage, extractMessageText } from "@/lib/api";
+import { LocalMessage } from "@/lib/types";
 
 const chatSuggestions = [
-  "What's the latest tech trend?",
-  "How does this work?",
-  "Generate an image of a cat",
-  "Generate a REST API with Express.js",
-  "What’s the best UX for onboarding?",
+  "주식 시장 현황이 어때?",
+  "삼성전자 주가 분석해줘",
+  "최근 주식 투자 트렌드는?",
+  "포트폴리오 관리 방법을 알려줘",
+  "오늘 주목할 종목이 있을까?",
 ];
 
-export default function AppRender() {
+export default function AppRender({
+  sessionId: initialSessionId,
+}: {
+  sessionId?: string;
+}) {
   const [prompt, setPrompt] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const uploadInputRef = useRef<HTMLInputElement>(null);
+  const [sessionId, setSessionId] = useState<string | undefined>(
+    initialSessionId
+  );
 
   const [isFirstResponse, setIsFirstResponse] = useState(false); // Understanding whether the conversation has started or not
 
@@ -38,27 +47,36 @@ export default function AppRender() {
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  const [messages, setMessages] = React.useState<
-    { id: number; role: string; content: string; files?: File[] }[]
-  >([]);
+  const [messages, setMessages] = React.useState<LocalMessage[]>([]);
 
-  const delay = (ms: number) =>
-    new Promise((resolve) => setTimeout(resolve, ms));
+  const stopStreaming = () => {
+    if (streamIntervalRef.current) {
+      clearInterval(streamIntervalRef.current);
+      streamIntervalRef.current = null;
+    }
+    setIsStreaming(false);
+  };
 
   const streamResponse = async () => {
-    if (isStreaming) return;
+    if (isStreaming) {
+      stopStreaming();
+      return;
+    }
 
     if (prompt.trim() || files.length > 0) {
       setIsFirstResponse(true);
       setIsStreaming(true);
 
       const newMessageId = messages.length + 1;
+      const userMessage = prompt.trim();
+
+      // 사용자 메시지 추가
       setMessages((prev) => [
         ...prev,
         {
           id: newMessageId,
           role: "user",
-          content: prompt,
+          content: userMessage,
           files: files,
         },
       ]);
@@ -66,11 +84,7 @@ export default function AppRender() {
       setPrompt("");
       setFiles([]);
 
-      await delay(2000);
-
-      const fullResponse =
-        "Fetching data in Next.js using getServerSideProps is straightforward. Here's a basic example:\n\n```ts\nexport async function getServerSideProps() {\n  const res = await fetch('https://api.example.com/data');\n  const data = await res.json();\n\n  return {\n    props: { data },\n  };\n}\n```\n\nThis function runs on the server before rendering the page and provides `data` as props.\nIt's ideal for dynamic data that changes often.\n\nWould you like to see an example using `getStaticProps` instead?";
-
+      // 어시스턴트 메시지 플레이스홀더 추가
       setMessages((prev) => [
         ...prev,
         {
@@ -80,29 +94,58 @@ export default function AppRender() {
         },
       ]);
 
-      let charIndex = 0;
-      streamContentRef.current = "";
+      try {
+        // 세션 ID가 있으면 포함해서 API 호출
+        const response = await sendChatMessage(userMessage, sessionId);
+        const responseText = extractMessageText(response);
 
-      streamIntervalRef.current = setInterval(() => {
-        if (charIndex < fullResponse.length) {
-          streamContentRef.current += fullResponse[charIndex];
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === newMessageId + 1
-                ? { ...msg, content: streamContentRef.current }
-                : msg
-            )
-          );
-          charIndex++;
-        } else {
-          clearInterval(streamIntervalRef.current!);
-          setIsStreaming(false);
+        // 세션 ID가 응답에 포함되고 현재 URL에 세션 ID가 없는 경우 주소만 변경
+        if (response.session_id && !sessionId) {
+          window.history.pushState(null, "", `/chat/${response.session_id}`);
         }
-      }, 30);
+
+        // 스트리밍 효과로 응답 표시
+        let charIndex = 0;
+        streamContentRef.current = "";
+
+        streamIntervalRef.current = setInterval(() => {
+          if (charIndex < responseText.length) {
+            streamContentRef.current += responseText[charIndex];
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === newMessageId + 1
+                  ? { ...msg, content: streamContentRef.current }
+                  : msg
+              )
+            );
+            charIndex++;
+          } else {
+            clearInterval(streamIntervalRef.current!);
+            setIsStreaming(false);
+          }
+        }, 30);
+      } catch (error) {
+        console.error("API 호출 오류:", error);
+
+        // 오류 메시지 표시
+        const errorMessage =
+          error instanceof Error
+            ? `오류가 발생했습니다: ${error.message}`
+            : "알 수 없는 오류가 발생했습니다.";
+
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === newMessageId + 1
+              ? { ...msg, content: errorMessage }
+              : msg
+          )
+        );
+        setIsStreaming(false);
+      }
     }
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       if (streamIntervalRef.current) {
         clearInterval(streamIntervalRef.current);
@@ -233,7 +276,7 @@ export default function AppRender() {
           </div>
         )}
 
-        <PromptInputTextarea placeholder="Ask me anything..." />
+        <PromptInputTextarea placeholder="주식에 대해 무엇이든 물어보세요..." />
 
         <PromptInputActions className="flex items-center justify-between gap-2 pt-2">
           <PromptInputAction tooltip="Attach files">
