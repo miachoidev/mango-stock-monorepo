@@ -148,7 +148,7 @@ export default function AppRender() {
   );
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center space-y-4">
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-4 bg-white p-4 mx-auto max-w-screen-lg border border-gray-200 rounded-lg">
       <ChatContainer
         className={cn("relative w-full flex-1 space-y-4 pe-2", {
           hidden: !isFirstResponse,
