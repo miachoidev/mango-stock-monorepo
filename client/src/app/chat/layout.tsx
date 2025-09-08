@@ -7,6 +7,8 @@ import {
 } from "@/components/sidebar/sidebar";
 import { LayoutDashboard, UserCog, Settings, LogOut, Link } from "lucide-react";
 import { cn } from "@/lib/utils";
+import StockContainer from "@/components/stock/stock-container";
+import { Button } from "@/components/ui/button";
 
 export default function ChatLayout({
   children,
@@ -44,11 +46,12 @@ export default function ChatLayout({
     },
   ];
   const [open, setOpen] = useState(false);
+  const [stockOpen, setStockOpen] = useState(false);
 
   return (
     <div
       className={cn(
-        "rounded-md flex flex-col md:flex-row bg-[#fff] dark:bg-neutral-800 w-full mx-auto border border-neutral-200 dark:border-neutral-700 overflow-hidden",
+        "rounded-md flex flex-col md:flex-row bg-[#fff] dark:bg-neutral-800 w-full mx-auto border border-neutral-200 dark:border-neutral-700 ",
         "h-screen"
       )}
     >
@@ -77,6 +80,20 @@ export default function ChatLayout({
         </SidebarBody>
       </Sidebar>
       <div className="w-full">{children}</div>
+      <div
+        className={cn(
+          "h-full flex items-center justify-center flex-col",
+          stockOpen ? "w-full" : "w-[100px]"
+        )}
+      >
+        <div className={cn("flex justify-start w-full mb-5")}>
+          <Button variant="outline" onClick={() => setStockOpen(!stockOpen)}>
+            {/* 페이지 좌우 접는 아이콘 */}
+            <Settings />
+          </Button>
+        </div>
+        <StockContainer className={`${stockOpen ? "block" : "hidden"}`} />
+      </div>
     </div>
   );
 }
