@@ -1,4 +1,5 @@
-import { ChatResponse } from "./types";
+import { ChatResponse } from "../types/chat-message";
+import { SessionsListResponse } from "../types/session";
 
 // API 기본 설정
 const API_BASE_URL = "http://localhost:8000";
@@ -31,6 +32,33 @@ export async function sendChatMessage(
     return data;
   } catch (error) {
     console.error("채팅 API 호출 오류:", error);
+    throw error;
+  }
+}
+
+// 세션 목록 가져오기 API 호출 함수
+export async function fetchSessions(
+  user_id: string
+): Promise<SessionsListResponse> {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/api/v1/adk/sessions/${user_id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: SessionsListResponse = await response.json();
+    return data;
+  } catch (error) {
+    console.error("세션 목록 API 호출 오류:", error);
     throw error;
   }
 }

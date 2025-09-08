@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { PromptLoader } from "@/components/ui/custom/prompt/loader";
 import { PromptScrollButton } from "@/components/ui/custom/prompt/scroll-button";
 import { sendChatMessage, extractMessageText } from "@/lib/api";
-import { LocalMessage } from "@/lib/types";
+import { LocalMessage } from "@/types/chat-message";
 
 const chatSuggestions = [
   "주식 시장 현황이 어때?",
@@ -191,7 +191,7 @@ export default function AppRender({
   );
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center space-y-4 bg-white p-4 mx-auto max-w-screen-lg border border-gray-200 rounded-lg">
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-4 chat-container p-4 mx-auto max-w-screen-lg border border-gray-200 rounded-lg">
       <ChatContainer
         className={cn("relative w-full flex-1 space-y-4 pe-2", {
           hidden: !isFirstResponse,
