@@ -1,12 +1,10 @@
 from google.adk.agents import Agent
 
-
 from stock.prompt import ROOT_AGENT_INSTR
-
-
 from stock.sub_agents.stock_analyzer.agent import stock_analyzer_agent
 from stock.sub_agents.stock_discovery.agent import stock_discovery_agent
 from stock.sub_agents.trading_recommander.agent import trading_recommander_agent
+from stock.utils.tools import ALL_KIWOOM_TOOLS
 
 
 def create_stock_agent():
@@ -20,7 +18,7 @@ def create_stock_agent():
             stock_discovery_agent,
             trading_recommander_agent,
         ],
-        tools=[],
+        tools=ALL_KIWOOM_TOOLS,
     )
 
 

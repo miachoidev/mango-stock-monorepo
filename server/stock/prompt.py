@@ -56,6 +56,17 @@ ROOT_AGENT_INSTR = """
 - 분석 내용 수정: patch_content tool 사용  
 - 트렌드 리서치: trend_research_agent_tool 사용
 
+## 키움증권 API 도구 사용
+- **get_access_token**: 키움증권 API 사용 전 반드시 토큰 발급
+- **get_account_evaluation**: 계좌평가현황 조회 (보유종목, 손익 등)
+- **get_stock_basic_info**: 종목 기본정보 조회 (PER, EPS, 시가총액 등)
+- **refresh_access_token**: 토큰 갱신
+
+### 도구 사용 순서:
+1. 먼저 get_access_token으로 토큰 발급
+2. 발급받은 토큰을 사용하여 다른 API 호출
+3. 토큰 만료시 refresh_access_token으로 갱신
+
 ## 품질 기준
 - **정확성**: 데이터 기반의 신뢰할 수 있는 분석
 - **객관성**: 편향되지 않은 균형잡힌 투자 의견
