@@ -1,14 +1,13 @@
 import { cn } from "@/lib/utils";
-import React, { useState } from "react";
+import React from "react";
 import DailyBalance from "./page/daily-balance";
-import StockSearch from "./page/stock-search";
 import { ArrowLeft } from "lucide-react";
-import Main from "./page/main";
+import Main from "./page/stock-main";
 import { useStockPage } from "@/hooks/use-stock-page";
 import StockData from "./page/stock-data";
-import StockDetail from "./page/detail";
+import StockDetail from "./page/stock-detail";
 
-type PageType = "daily-balance" | "main" | "stock-search" | "stock-data";
+type PageType = "daily-balance" | "main" | "stock-data";
 
 const StockContainer = ({ className }: { className: string }) => {
   const { page, setPage } = useStockPage();
@@ -35,7 +34,6 @@ const StockContainer = ({ className }: { className: string }) => {
       <div className="h-full p-4 py-16">
         {page === "main" && <Main />}
         {page === "daily-balance" && <DailyBalance />}
-        {page === "stock-search" && <StockSearch />}
         {page === "stock-data" && <StockData />}
         {page === "stock-detail" && <StockDetail />}
       </div>

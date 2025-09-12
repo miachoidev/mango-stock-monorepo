@@ -1,5 +1,5 @@
 import { BalanceDetail } from "@/types/kioom";
-import { KIOOM_API } from "@/utils/api/kiwoom";
+import { KIOOM_API } from "@/utils/api/kiwoom.api";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 

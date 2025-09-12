@@ -3,7 +3,7 @@ import { STOCK_DATA_API } from "@/utils/api/stock-data";
 import React from "react";
 
 const Main = () => {
-  const { setPage } = useStockPage();
+  const { setPage, setStock } = useStockPage();
 
   const list = [
     { title: "검색 🔎", onClick: () => setPage("stock-data") },
@@ -30,7 +30,10 @@ const Main = () => {
           <div
             key={stock.code}
             className="bg-purple-500 px-4 py-2 rounded-md text-white text-sm cursor-pointer hover:bg-purple-600 transition-colors"
-            onClick={() => setPage("stock-search")}
+            onClick={() => {
+              setPage("stock-detail");
+              setStock(stock);
+            }}
           >
             {stock.name}
           </div>

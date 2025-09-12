@@ -26,3 +26,36 @@ export interface BalanceDetail {
   return_code: number;
   return_msg: string;
 }
+
+export interface StockChart {
+  cur_prc: string;
+  trde_qty: string;
+  cntr_tm: string;
+  open_pric: string;
+  high_pric: string;
+  low_pric: string;
+  upd_stkpc_tp: string;
+  upd_rt: string;
+  bic_inds_tp: string;
+  sm_inds_tp: string;
+  stk_infr: string;
+  upd_stkpc_event: string;
+  pred_close_pric: string;
+}
+
+export interface StockChartDay {
+  cur_prc: string;
+  trde_qty: string;
+  trde_prica: string;
+  dt: string;
+  open_pric: string;
+  high_pric: string;
+  low_pric: string;
+  upd_stkpc_tp: string;
+  upd_rt: string;
+  bic_inds_tp: string;
+  sm_inds_tp: string;
+  stk_infr: string;
+  upd_stkpc_event: string;
+  pred_close_pric: string;
+}
