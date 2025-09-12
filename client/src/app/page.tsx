@@ -1,11 +1,27 @@
-import Link from "next/link";
+"use client";
+import { kioomLogin } from "@/utils/api/kioom-login";
+
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+  const handleLogin = async () => {
+    const token = await kioomLogin();
+    if (token) {
+      Cookies.set("token", token);
+      router.push("/chat");
+    }
+  };
   return (
     <div className="flex w-full h-[100vh] justify-center items-center">
-      <div className="flex flex-col gap-2 bg-blue-300 w-[100px] h-[100px] justify-center items-center rounded-md">
-        <Link href="/chat">Chat</Link>
-      </div>
+      {/* <Link href="/chat">Chat</Link> */}
+      <button
+        className="bg-purple-500 text-white p-5 rounded-md text-2xl font-bold"
+        onClick={handleLogin}
+      >
+        Login
+      </button>
     </div>
   );
 }

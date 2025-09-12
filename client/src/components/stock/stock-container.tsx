@@ -1,15 +1,36 @@
 import { cn } from "@/lib/utils";
-import React from "react";
+import React, { useState } from "react";
+import DailyBalance from "./page/daily-balance";
+import { ArrowLeft } from "lucide-react";
+import Main from "./page/main";
+import { useStockPage } from "@/hooks/use-stock-page";
 
 const StockContainer = ({ className }: { className: string }) => {
+  const { page, setPage } = useStockPage();
+
   return (
     <div
       className={cn(
-        "w-[400px] h-[800px] mr-10 bg-white rounded-[40px] p-10 shadow-lg overflow-y-auto overflow-x-hidden relative scroll-smooth border-4 border-gray-200",
+        "w-[400px] h-[800px] mr-10 bg-white rounded-[40px] shadow-lg overflow-y-auto overflow-x-hidden relative scroll-smooth border-4 border-gray-200",
         className
       )}
     >
-      StockContainer
+      <div className="flex items-center py-2 absolute top-0 left-0 w-full z-10">
+        {page !== "main" && (
+          <ArrowLeft
+            onClick={() => setPage("main")}
+            className="absolute left-4 top-4 z-11 cursor-pointer"
+          />
+        )}
+        <div className="text-2xl font-bold text-center w-full ">
+          {page.toUpperCase()}
+        </div>
+      </div>
+
+      <div className="h-full p-4 py-16">
+        {page === "main" && <Main />}
+        {page === "daily-balance" && <DailyBalance />}
+      </div>
     </div>
   );
 };

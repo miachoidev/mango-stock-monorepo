@@ -46,7 +46,7 @@ export default function ChatLayout({
     },
   ];
   const [open, setOpen] = useState(false);
-  const [stockOpen, setStockOpen] = useState(false);
+  const [stockOpen, setStockOpen] = useState(true);
 
   return (
     <div
