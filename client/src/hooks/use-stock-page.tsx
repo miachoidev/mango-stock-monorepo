@@ -1,8 +1,9 @@
 import { create } from "zustand";
 
+type PageType = "daily-balance" | "main" | "stock-search";
 interface StockPageState {
-  page: string;
-  setPage: (page: string) => void;
+  page: PageType;
+  setPage: (page: PageType) => void;
 }
 
 const useStockPageStore = create<StockPageState>((set) => ({

@@ -1,5 +1,4 @@
 import axios from "axios";
-import Cookies from "js-cookie";
 
 // 접근토큰 발급 (클라이언트에서 API 라우트 호출)
 export const kioomLogin = async () => {
@@ -11,7 +10,7 @@ export const kioomLogin = async () => {
     console.log(response);
 
     if (response.status === 200) {
-      Cookies.set("token", response.data.token);
+      localStorage.setItem("token", response.data.token);
       return response.data.token;
     } else {
       console.error("로그인 실패:", response.data);

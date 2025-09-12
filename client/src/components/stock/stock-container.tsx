@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import React, { useState } from "react";
 import DailyBalance from "./page/daily-balance";
+import StockSearch from "./page/stock-search";
 import { ArrowLeft } from "lucide-react";
 import Main from "./page/main";
 import { useStockPage } from "@/hooks/use-stock-page";
@@ -30,6 +31,7 @@ const StockContainer = ({ className }: { className: string }) => {
       <div className="h-full p-4 py-16">
         {page === "main" && <Main />}
         {page === "daily-balance" && <DailyBalance />}
+        {page === "stock-search" && <StockSearch />}
       </div>
     </div>
   );

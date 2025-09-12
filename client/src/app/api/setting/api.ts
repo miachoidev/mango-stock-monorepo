@@ -1,5 +1,4 @@
 import axios from "axios";
-import Cookies from "js-cookie";
 
 // export const KIOOM_API_BASE_URL = "https://api.kiwoom.com";
 export const KIOOM_API_BASE_URL = "https://mockapi.kiwoom.com/api";
@@ -12,12 +11,9 @@ export const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.request.use((config) => {
-  config.headers.authorization = `Bearer ${Cookies.get("token")}`;
   config.headers["Content-Type"] = "application/json";
+  config.headers["authorization"] = `Bearer ${localStorage.getItem("token")}`;
+  config.headers["cont-yn"] = "Y";
+  config.headers["next-key"] = "0";
   return config;
 });
-
-export const KIOOM_API_HEADER_KEY = {
-  일별잔고수익률: "ka01690",
-  계좌수익률: "ka10085",
-};
