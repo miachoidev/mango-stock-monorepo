@@ -7,7 +7,7 @@ import {
 } from "@/components/sidebar/sidebar";
 import { LayoutDashboard, UserCog, Settings, LogOut, Link } from "lucide-react";
 import { cn } from "@/lib/utils";
-import StockContainer from "@/components/stock/stock-container";
+import StockContainer from "@/components/stock";
 import { Button } from "@/components/ui/button";
 
 export default function ChatLayout({

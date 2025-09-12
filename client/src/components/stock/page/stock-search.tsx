@@ -1,10 +1,11 @@
 "use client";
 
-import { KIOOM_API } from "@/utils/api/kioom";
+import { KIOOM_API } from "@/utils/api/kiwoom";
 import { StockInfo } from "@/types/kioom";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { STOCK_DATA_API } from "@/utils/api/stock-data";
 
 const StockSearch = () => {
   const [searchCode, setSearchCode] = useState("");
@@ -35,28 +36,7 @@ const StockSearch = () => {
     }
   };
 
-  const popularStocks = [
-    {
-      code: "005930",
-      name: "삼성전자",
-    },
-    {
-      code: "000660",
-      name: "SK하이닉스",
-    },
-    {
-      code: "035420",
-      name: "NAVER",
-    },
-    {
-      name: "카카오",
-      code: "035720",
-    },
-    {
-      name: "LG화학",
-      code: "003550",
-    },
-  ];
+  const popularStocks = STOCK_DATA_API.getPopularStocks();
 
   return (
     <div className="h-full bg-white flex flex-col p-4">

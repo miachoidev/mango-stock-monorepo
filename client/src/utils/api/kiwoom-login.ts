@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // 접근토큰 발급 (클라이언트에서 API 라우트 호출)
-export const kioomLogin = async () => {
+export const kiwoomLogin = async () => {
   try {
     const response = await axios.post("/api/kiwoom/login", {
       method: "POST",

@@ -1,5 +1,5 @@
 "use client";
-import { kioomLogin } from "@/utils/api/kioom-login";
+import { kiwoomLogin } from "@/utils/api/kiwoom-login";
 
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 export default function Home() {
   const router = useRouter();
   const handleLogin = async () => {
-    const token = await kioomLogin();
+    const token = await kiwoomLogin();
     if (token) {
       Cookies.set("token", token);
       router.push("/chat");
