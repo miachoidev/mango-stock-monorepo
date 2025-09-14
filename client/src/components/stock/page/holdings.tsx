@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { HoldingStock, HoldingsResponse } from "@/types/stock";
-import { HOLDINGS_API } from "@/utils/api/holdings.api";
+import React, { useEffect, useState, useCallback } from "react";
+import { HoldingStock } from "@/types/stock";
+import { KIOOM_API } from "@/utils/api/kiwoom.api";
 import { useStockPage } from "@/hooks/use-stock-page";
-import { TrendingUp, TrendingDown, DollarSign, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, BarChart3 } from "lucide-react";
+import { toast } from "sonner";
 
 const Holdings = () => {
   const { setPage, setStock } = useStockPage();
@@ -12,27 +13,85 @@ const Holdings = () => {
   const [totalProfitLossRate, setTotalProfitLossRate] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchHoldings();
-  }, []);
-
-  const fetchHoldings = async () => {
+  const fetchHoldings = useCallback(async () => {
     try {
       setLoading(true);
-      const response: HoldingsResponse = await HOLDINGS_API.getHoldings();
-
-      if (response.success) {
-        setHoldings(response.data);
-        setTotalValue(response.totalValue);
-        setTotalProfitLoss(response.totalProfitLoss);
-        setTotalProfitLossRate(response.totalProfitLossRate);
+      const response = await KIOOM_API.getHoldingStocks();
+      console.log("보유 종목 조회 응답:", response);
+      if (response.return_code !== 0) {
+        toast.error(response.return_msg);
+        setHoldings([]);
+        setTotalValue(0);
+        setTotalProfitLoss(0);
+        setTotalProfitLossRate(0);
+        return;
       }
+
+      const toNumber = (v?: string) => {
+        if (!v) return 0;
+        // 응답이 문자열 숫자이므로 안전 변환
+        const n = Number(String(v).replace(/,/g, ""));
+        return Number.isNaN(n) ? 0 : n;
+      };
+
+      const items = response.acnt_evlt_remn_indv_tot ?? [];
+
+      const mapped = items.map((item) => {
+        const quantity = toNumber(item.rmnd_qty);
+        const currentPrice = toNumber(item.cur_prc || item.pred_close_pric);
+        const averagePrice = toNumber(item.pur_pric);
+        const totalValue = toNumber(item.evlt_amt);
+        const profitLoss = toNumber(item.evltv_prft);
+        const profitLossRate = toNumber(item.prft_rt);
+
+        return {
+          code: item.stk_cd,
+          name: item.stk_nm,
+          quantity,
+          averagePrice,
+          currentPrice,
+          totalValue,
+          profitLoss,
+          profitLossRate,
+          // 시가총액 정보는 응답에 없어 0으로 설정
+          marketValue: 0,
+        } as HoldingStock;
+      });
+
+      // 합계 계산 (API가 제공하면 사용, 없으면 계산)
+      const apiTotalValue = toNumber(response.tot_evlt_amt);
+      const apiTotalProfitLoss = toNumber(response.tot_evlt_pl);
+      const apiTotalProfitLossRate = toNumber(response.tot_prft_rt);
+
+      const calcTotalValue = mapped.reduce((sum, s) => sum + s.totalValue, 0);
+      const calcTotalProfitLoss = mapped.reduce(
+        (sum, s) => sum + s.profitLoss,
+        0
+      );
+      const calcTotalProfitLossRate =
+        calcTotalValue !== 0
+          ? (calcTotalProfitLoss / (calcTotalValue - calcTotalProfitLoss)) * 100
+          : 0;
+
+      setHoldings(mapped);
+      setTotalValue(apiTotalValue || calcTotalValue);
+      setTotalProfitLoss(apiTotalProfitLoss || calcTotalProfitLoss);
+      setTotalProfitLossRate(apiTotalProfitLossRate || calcTotalProfitLossRate);
     } catch (error) {
       console.error("보유 종목 조회 실패:", error);
+      // 에러 시 빈 배열로 설정
+      setHoldings([]);
+      setTotalValue(0);
+      setTotalProfitLoss(0);
+      setTotalProfitLossRate(0);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchHoldings();
+  }, [fetchHoldings]);
 
   const handleStockClick = (stock: HoldingStock) => {
     setStock({ code: stock.code, name: stock.name });
