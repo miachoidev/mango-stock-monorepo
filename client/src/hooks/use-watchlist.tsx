@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { StockItem } from '@/types/stock';
 import { WISHLIST_API } from '@/utils/api/wishlist.api';
+import { toast } from 'sonner';
 
 export const useWatchlist = () => {
   const [watchlist, setWatchlist] = useState<StockItem[]>([]);
@@ -20,9 +21,12 @@ export const useWatchlist = () => {
     if (!isAlreadyInWatchlist) {
       await WISHLIST_API.addWishlist(stock);
       await loadWatchlist();
+      toast.success(`${stock.name}이(가) 관심 목록에 추가되었습니다.`);
       return true;
+    } else {
+      toast.info(`${stock.name}은(는) 이미 관심 목록에 있습니다.`);
+      return false;
     }
-    return false;
   };
 
   const removeFromWatchlist = async (code: string) => {

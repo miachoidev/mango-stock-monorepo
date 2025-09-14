@@ -2,6 +2,7 @@ import React from "react";
 import { useWatchlist } from "@/hooks/use-watchlist";
 import { useStockPage } from "@/hooks/use-stock-page";
 import { Trash2, Star } from "lucide-react";
+import { toast } from "sonner";
 
 const Watchlist = () => {
   const { watchlist, removeFromWatchlist } = useWatchlist();
@@ -17,7 +18,11 @@ const Watchlist = () => {
     code: string
   ) => {
     e.stopPropagation();
+    const stock = watchlist.find(item => item.code === code);
     await removeFromWatchlist(code);
+    if (stock) {
+      toast.success(`${stock.name}이(가) 관심 목록에서 제거되었습니다.`);
+    }
   };
 
   if (watchlist.length === 0) {

@@ -1,9 +1,9 @@
 import { useStockPage } from "@/hooks/use-stock-page";
 import { kiwoomLogin } from "@/utils/api/kiwoom-login";
 import { STOCK_DATA_API } from "@/utils/api/stock-data";
-import { useRouter } from "next/navigation";
 import React from "react";
 import Cookies from "js-cookie";
+import { toast } from "sonner";
 
 const Main = () => {
   const { setPage, setStock } = useStockPage();
@@ -21,7 +21,7 @@ const Main = () => {
     const token = await kiwoomLogin();
     if (token) {
       Cookies.set("token", token);
-      toast;
+      toast.success("로그인 성공");
     }
   };
 
