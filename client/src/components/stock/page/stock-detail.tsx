@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import useChat from "@/hooks/use-chat";
 
 const StockDetail = () => {
   const { stock, setPage, setTradeType } = useStockPage();
@@ -95,6 +96,29 @@ const StockDetail = () => {
       isFlat: change === 0,
     };
   }, [chartData]);
+
+  const { streamResponse } = useChat();
+
+  const onClickAnalyzeStock = () => {
+    const newMessage = `
+      ${stock.name} 주식에 대해 분석해줘
+    `;
+    streamResponse(newMessage);
+  };
+
+  const onClickInvestAdvice = () => {
+    const newMessage = `
+      ${stock.name} 주식에 대해 투자 조언해줘
+    `;
+    streamResponse(newMessage);
+  };
+
+  const onClickIntroduceStock = () => {
+    const newMessage = `
+      ${stock.name} 주식에 대해 소개해줘
+    `;
+    streamResponse(newMessage);
+  };
 
   if (isLoading) {
     return (
@@ -190,17 +214,7 @@ const StockDetail = () => {
           매도
         </Button>
       </div>
-      <div className="w-full">
-        <Button
-          className="w-full mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-          onClick={() => {
-            setPage("stock-trade");
-            setTradeType("buy");
-          }}
-        >
-          분석
-        </Button>
-      </div>
+
       <div className="w-full">
         {/* 가격 차트 */}
         <div className="w-full min-h-0">
@@ -249,6 +263,33 @@ const StockDetail = () => {
             </ResponsiveContainer>
           </div>
         </div>
+      </div>
+
+      <div className="w-full">
+        <Button
+          className="w-full mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+          onClick={() => {
+            onClickAnalyzeStock();
+          }}
+        >
+          분석
+        </Button>
+        <Button
+          className="w-full mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+          onClick={() => {
+            onClickInvestAdvice();
+          }}
+        >
+          투자 조언
+        </Button>
+        <Button
+          className="w-full mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+          onClick={() => {
+            onClickIntroduceStock();
+          }}
+        >
+          종목 소개
+        </Button>
       </div>
     </div>
   );

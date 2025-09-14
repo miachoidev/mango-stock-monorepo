@@ -50,9 +50,6 @@ const Main = () => {
 
       {/* 메뉴 버튼 섹션 */}
       <div className="px-4">
-        <h2 className="text-lg font-semibold text-gray-700 mb-4 text-center">
-          주요 기능
-        </h2>
         <div className="grid grid-cols-2 gap-3 max-w-[320px] mx-auto">
           {list.map((item) => (
             <MainItem

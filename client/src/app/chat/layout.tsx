@@ -55,7 +55,7 @@ export default function ChatLayout({
         "h-screen"
       )}
     >
-      <Sidebar open={open} setOpen={setOpen}>
+      {/* <Sidebar open={open} setOpen={setOpen}>
         <SidebarBody className="justify-between gap-10 border-r border-neutral-200 dark:border-neutral-700">
           <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
             <div className="mt-8 flex flex-col gap-2">
@@ -78,7 +78,7 @@ export default function ChatLayout({
             />
           </div>
         </SidebarBody>
-      </Sidebar>
+      </Sidebar> */}
       <div className="w-full">{children}</div>
       <div
         className={cn(
