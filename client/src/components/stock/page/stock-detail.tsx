@@ -1,8 +1,8 @@
 import { useStockPage } from "@/hooks/use-stock-page";
-import { StockChart, StockChartDay } from "@/types/kioom";
+import { StockChartDay } from "@/types/kioom";
 import { KIOOM_API } from "@/utils/api/kiwoom.api";
 import { useQuery } from "@tanstack/react-query";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   LineChart,
   Line,
@@ -12,23 +12,17 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { Button } from "@/components/ui/button";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 const StockDetail = () => {
   const { stock } = useStockPage();
-  const [chartType, setChartType] = useState<"minute" | "day" | "week">("week");
 
-  const { data, isLoading, error } = useQuery<StockChartDay[] | StockChart[]>({
-    queryKey: ["stockChart", stock.code, chartType],
-    queryFn: () =>
-      chartType === "minute"
-        ? KIOOM_API.getStockChart(stock.code, 5)
-        : chartType === "day"
-        ? KIOOM_API.getStockChartDay(stock.code)
-        : KIOOM_API.getStockChartWeek(stock.code),
+  const { data, isLoading, error } = useQuery<StockChartDay[]>({
+    queryKey: ["stockChart", stock.code, "week"],
+    queryFn: () => KIOOM_API.getStockChartWeek(stock.code),
   });
 
-  // 데이터 정리 및 포맷팅
+  // 데이터 정리 및 포맷팅 (주봉 데이터만)
   const chartData = useMemo(() => {
     if (!data) return [];
 
@@ -39,34 +33,18 @@ const StockDetail = () => {
         return numPrice < 0 ? Math.abs(numPrice) : numPrice;
       };
 
-      // 시간 포맷팅
+      // 시간 포맷팅 (주봉용)
       const formatTime = (timeStr: string) => {
-        if (!timeStr)
-          return chartType === "minute"
-            ? `분봉 ${index + 1}`
-            : `일봉 ${index + 1}`;
+        if (!timeStr) return `주봉 ${index + 1}`;
 
-        if (chartType === "minute") {
-          // 분봉: cntr_tm 사용 (YYYYMMDDHHMMSS)
-          const hour = timeStr.substring(8, 10);
-          const minute = timeStr.substring(10, 12);
-          return `${hour}:${minute}`;
-        } else {
-          // 일봉: dt 사용 (YYYYMMDD)
-          const year = timeStr.substring(0, 4);
-          const month = timeStr.substring(4, 6);
-          const day = timeStr.substring(6, 8);
-          return `${month}/${day}`;
-        }
+        // dt 사용 (YYYYMMDD)
+        const month = timeStr.substring(4, 6);
+        const day = timeStr.substring(6, 8);
+        return `${month}/${day}`;
       };
 
-      // 시간 필드 선택
-      const timeField =
-        chartType === "minute"
-          ? (item as StockChart).cntr_tm
-          : chartType === "day"
-          ? (item as StockChartDay).dt
-          : (item as StockChartDay).dt;
+      // 주봉 데이터의 dt 필드 사용
+      const timeField = item.dt;
 
       return {
         time: formatTime(timeField),
@@ -88,7 +66,32 @@ const StockDetail = () => {
       }
       return 0;
     });
-  }, [data, chartType]);
+  }, [data]);
+
+  // 현재 가격 정보 계산
+  const currentPriceInfo = useMemo(() => {
+    if (!chartData || chartData.length === 0) return null;
+
+    const latestData = chartData[chartData.length - 1];
+    const previousData = chartData[chartData.length - 2];
+
+    if (!latestData) return null;
+
+    const currentPrice = latestData.price;
+    const previousPrice = previousData ? previousData.price : currentPrice;
+    const change = currentPrice - previousPrice;
+    const changePercent =
+      previousPrice !== 0 ? (change / previousPrice) * 100 : 0;
+
+    return {
+      currentPrice,
+      change,
+      changePercent,
+      isUp: change > 0,
+      isDown: change < 0,
+      isFlat: change === 0,
+    };
+  }, [chartData]);
 
   if (isLoading) {
     return (
@@ -117,38 +120,51 @@ const StockDetail = () => {
   }
 
   return (
-    <div className="h-full bg-white flex flex-col p-4 w-full">
+    <div className="h-full bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col p-6 w-full">
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <div className="text-3xl font-bold">{stock.name}</div>
-          <span className="text-sm text-gray-600">{stock.code}</span>
-        </div>
+      <div className="mb-8">
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="text-xl font-bold text-gray-800">{stock.name}</div>
+            <span className="bg-gray-100 px-2 py-1 rounded-md text-xs text-gray-600 font-medium">
+              {stock.code}
+            </span>
+          </div>
 
-        {/* 차트 타입 전환 버튼 */}
-      </div>
-      <div className="flex gap-2">
-        <Button
-          variant={chartType === "minute" ? "default" : "outline"}
-          onClick={() => setChartType("minute")}
-          size="sm"
-        >
-          분봉
-        </Button>
-        <Button
-          variant={chartType === "day" ? "default" : "outline"}
-          onClick={() => setChartType("day")}
-          size="sm"
-        >
-          일봉
-        </Button>
-        <Button
-          variant={chartType === "week" ? "default" : "outline"}
-          onClick={() => setChartType("week")}
-          size="sm"
-        >
-          주봉
-        </Button>
+          {/* 현재 가격 정보 */}
+          {currentPriceInfo && (
+            <div className="space-y-4 flex flex-col items-start justify-center">
+              <div className="text-xl font-bold text-gray-900">
+                {currentPriceInfo.currentPrice.toLocaleString()}원
+              </div>
+              <div
+                className={`flex items-center gap-2 rounded-md ${
+                  currentPriceInfo.isUp
+                    ? "text-red-600"
+                    : currentPriceInfo.isDown
+                    ? "text-blue-600"
+                    : "text-gray-600"
+                }`}
+              >
+                {currentPriceInfo.isUp && <TrendingUp className="w-6 h-6" />}
+                {currentPriceInfo.isDown && (
+                  <TrendingDown className="w-6 h-6" />
+                )}
+                {currentPriceInfo.isFlat && <Minus className="w-6 h-6" />}
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold flex items-center gap-1">
+                    {currentPriceInfo.change >= 0 ? "+" : ""}
+                    {currentPriceInfo.change.toLocaleString()}원
+                  </span>
+                  <span className="text-sm font-semibold">
+                    ({currentPriceInfo.changePercent >= 0 ? "+" : ""}
+                    {currentPriceInfo.changePercent.toFixed(2)}%)
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 차트 컨테이너 */}
