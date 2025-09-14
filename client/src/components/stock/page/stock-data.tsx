@@ -4,12 +4,11 @@ import React, { useState, useEffect, useMemo } from "react";
 import { STOCK_DATA_API } from "@/utils/api/stock-data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-interface StockItem {
-  code: string;
-  name: string;
-  market?: string;
-}
+import { Heart, HeartIcon, HeartPlus, HeartPulse } from "lucide-react";
+import { WISHLIST_API } from "@/utils/api/wishlist.api";
+import { StockItem } from "@/types/stock";
+import { useRouter } from "next/navigation";
+import { useStockPage } from "@/hooks/use-stock-page";
 
 const StockData = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,6 +16,8 @@ const StockData = () => {
   const [filteredData, setFilteredData] = useState<StockItem[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const itemsPerPage = 10;
+
+  const { setPage, setStock } = useStockPage();
 
   // 검색 기능
   const handleSearch = (term: string) => {
@@ -32,10 +33,7 @@ const StockData = () => {
       // 검색어가 있으면 필터링
       const allData = STOCK_DATA_API.getStockData(1, 10000).data; // 전체 데이터 가져오기
       const filtered = allData.filter(
-        (stock) =>
-          stock.name.includes(term) ||
-          stock.code.includes(term) ||
-          (stock.market && stock.market.includes(term))
+        (stock) => stock.name.includes(term) || stock.code.includes(term)
       );
       setFilteredData(filtered.slice(0, itemsPerPage));
       setTotalCount(filtered.length);
@@ -84,8 +82,13 @@ const StockData = () => {
   const startIndex = (currentPage - 1) * itemsPerPage + 1;
   const endIndex = Math.min(currentPage * itemsPerPage, totalCount);
 
+  const handleStockClick = (stock: StockItem) => {
+    setPage("stock-detail");
+    setStock(stock);
+  };
+
   return (
-    <div className="p-2 max-w-6xl mx-auto">
+    <div className="p-2 max-w-6xl mx-auto bg-gray-100">
       <div className="mb-6">
         <div className="flex mb-4 items-center w-full justify-between gap-3">
           <Input
@@ -113,35 +116,15 @@ const StockData = () => {
       </div>
 
       {/* 데이터 테이블 */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  종목코드
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  종목명
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredData.map((stock, index) => (
-                <tr
-                  key={`${stock.code}-${index}`}
-                  className="hover:bg-gray-50 border border-gray-200"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900 border border-gray-200">
-                    {stock.code}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {stock.name}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <div>
+        <div className="flex flex-col w-full gap-2 h-[500px] overflow-y-auto pb-4">
+          {filteredData.map((stock) => (
+            <StockDataItem
+              key={stock.code}
+              stock={stock}
+              handleStockClick={handleStockClick}
+            />
+          ))}
         </div>
 
         {/* 페이지네이션 */}
@@ -166,16 +149,6 @@ const StockData = () => {
               </Button>
             </div>
             <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-gray-700">
-                  <span className="font-medium">{startIndex}</span>
-                  {" - "}
-                  <span className="font-medium">{endIndex}</span>
-                  {" / "}
-                  <span className="font-medium">{totalCount}</span>
-                  {" 개"}
-                </p>
-              </div>
               <div>
                 <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                   <Button
@@ -229,6 +202,58 @@ const StockData = () => {
               </div>
             </div>
           </div>
+        )}
+      </div>
+    </div>
+  );
+};
+const StockDataItem = ({
+  stock,
+  handleStockClick,
+}: {
+  stock: StockItem;
+  handleStockClick: (stock: StockItem) => void;
+}) => {
+  // const [isFavorite, setIsFavorite] = useState(selected);
+
+  const [liked, setLiked] = useState(false);
+  useEffect(() => {
+    const wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
+    const isFavorite = (code: string) => {
+      return wishlist.some((item: StockItem) => item.code === code) as boolean;
+    };
+    setLiked(isFavorite(stock.code));
+  }, [stock]);
+
+  const handleFavorite = (stock: StockItem) => {
+    if (liked) {
+      WISHLIST_API.removeWishlist({ code: stock.code, name: stock.name });
+    } else {
+      WISHLIST_API.addWishlist({ code: stock.code, name: stock.name });
+    }
+    setLiked(!liked);
+  };
+
+  return (
+    <div
+      className="flex items-center justify-between w-full p-3 rounded-lg bg-white cursor-pointer"
+      onClick={() => handleStockClick(stock)}
+    >
+      <div>{stock.name}</div>
+      <div
+        className="w-6 h-6"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleFavorite(stock);
+        }}
+      >
+        {liked ? (
+          <HeartIcon
+            fill="red"
+            className="w-6 h-6 cursor-pointer text-red-500"
+          />
+        ) : (
+          <Heart className="w-6 h-6 cursor-pointer" />
         )}
       </div>
     </div>

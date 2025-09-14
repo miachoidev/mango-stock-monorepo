@@ -7,9 +7,7 @@ const Main = () => {
 
   const list = [
     { title: "검색 🔎", onClick: () => setPage("stock-data") },
-    { title: "종목 검색", onClick: () => setPage("stock-search") },
     { title: "일별잔고수익률", onClick: () => setPage("daily-balance") },
-    { title: "보유 종목", onClick: () => setPage("daily-balance") },
   ];
 
   const popularStocks = STOCK_DATA_API.getPopularStocks();
