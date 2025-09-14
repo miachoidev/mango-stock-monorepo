@@ -13,9 +13,12 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const StockDetail = () => {
-  const { stock } = useStockPage();
+  const { stock, setPage, setTradeType } = useStockPage();
+
+  // 매도/매수 상태
 
   const { data, isLoading, error } = useQuery<StockChartDay[]>({
     queryKey: ["stockChart", stock.code, "week"],
@@ -166,8 +169,27 @@ const StockDetail = () => {
           )}
         </div>
       </div>
-
       {/* 차트 컨테이너 */}
+      <div className="w-full flex gap-4">
+        <Button
+          className="flex-1 bg-red-500"
+          onClick={() => {
+            setPage("stock-trade");
+            setTradeType("buy");
+          }}
+        >
+          매수
+        </Button>
+        <Button
+          className="flex-1 bg-blue-500"
+          onClick={() => {
+            setPage("stock-trade");
+            setTradeType("sell");
+          }}
+        >
+          매도
+        </Button>
+      </div>
       <div className="w-full">
         {/* 가격 차트 */}
         <div className="w-full min-h-0">

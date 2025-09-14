@@ -7,7 +7,7 @@ import { useStockPage } from "@/hooks/use-stock-page";
 import StockData from "./page/stock-data";
 import StockDetail from "./page/stock-detail";
 import Watchlist from "./page/watchlist";
-
+import StockTrade from "./page/stock-trade";
 
 const StockContainer = ({ className }: { className: string }) => {
   const { page, setPage } = useStockPage();
@@ -22,7 +22,13 @@ const StockContainer = ({ className }: { className: string }) => {
       <div className="flex items-center py-2 absolute top-0 left-0 w-full z-10">
         {page !== "main" && (
           <ArrowLeft
-            onClick={() => setPage("main")}
+            onClick={() => {
+              if (page === "stock-trade") {
+                setPage("stock-detail");
+                return;
+              }
+              setPage("main");
+            }}
             className="absolute left-4 top-4 z-11 cursor-pointer"
           />
         )}
@@ -37,6 +43,7 @@ const StockContainer = ({ className }: { className: string }) => {
         {page === "stock-data" && <StockData />}
         {page === "stock-detail" && <StockDetail />}
         {page === "watchlist" && <Watchlist />}
+        {page === "stock-trade" && <StockTrade />}
       </div>
     </div>
   );

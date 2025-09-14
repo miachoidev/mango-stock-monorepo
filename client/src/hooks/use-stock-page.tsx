@@ -10,6 +10,8 @@ interface StockPageState {
   setPage: (page: string) => void;
   stock: StockInfo;
   setStock: (stock: StockInfo) => void;
+  setTradeType: (tradeType: "buy" | "sell") => void;
+  tradeType: "buy" | "sell";
 }
 
 const useStockPageStore = create<StockPageState>((set) => ({
@@ -17,10 +19,13 @@ const useStockPageStore = create<StockPageState>((set) => ({
   setPage: (page) => set({ page }),
   stock: { code: "", name: "" },
   setStock: (stock) => set({ stock }),
+  setTradeType: (tradeType) => set({ tradeType }),
+  tradeType: "buy",
 }));
 
 export const useStockPage = () => {
-  const { page, setPage, stock, setStock } = useStockPageStore();
+  const { page, setPage, stock, setStock, setTradeType, tradeType } =
+    useStockPageStore();
 
-  return { page, setPage, stock, setStock };
+  return { page, setPage, stock, setStock, setTradeType, tradeType };
 };
