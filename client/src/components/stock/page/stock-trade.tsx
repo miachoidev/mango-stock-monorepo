@@ -157,7 +157,7 @@ export default function StockTrade() {
 
   if (error) {
     return (
-      <div className="h-full bg-white flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <div className="text-lg text-red-500">
           차트 데이터를 불러올 수 없습니다.
         </div>
@@ -167,14 +167,14 @@ export default function StockTrade() {
 
   if (!data || data.length === 0) {
     return (
-      <div className="h-full bg-white flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <div className="text-lg text-gray-500">차트 데이터가 없습니다.</div>
       </div>
     );
   }
 
   return (
-    <div className="mt-6 bg-white rounded-2xl shadow-lg border border-gray-100">
+    <div className="mt-6  rounded-2xl shadow-lg border border-gray-100">
       <div className="p-6">
         <div className="flex items-center gap-3 mb-6">
           <DollarSign className="w-6 h-6 text-green-500" />

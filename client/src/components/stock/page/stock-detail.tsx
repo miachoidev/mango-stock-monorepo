@@ -123,7 +123,7 @@ const StockDetail = () => {
   }
 
   return (
-    <div className="h-full bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col p-6 w-full">
+    <div className="h-full flex flex-col p-6 w-full">
       {/* 헤더 */}
       <div className="mb-8">
         <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
@@ -188,6 +188,17 @@ const StockDetail = () => {
           }}
         >
           매도
+        </Button>
+      </div>
+      <div className="w-full">
+        <Button
+          className="w-full mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+          onClick={() => {
+            setPage("stock-trade");
+            setTradeType("buy");
+          }}
+        >
+          분석
         </Button>
       </div>
       <div className="w-full">

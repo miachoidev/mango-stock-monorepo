@@ -3,15 +3,34 @@ import { kiwoomLogin } from "@/utils/api/kiwoom-login";
 import React from "react";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Search, Star } from "lucide-react";
+import { ShoppingCart, TrendingUp } from "lucide-react";
 
 const Main = () => {
   const { setPage } = useStockPage();
 
   const list = [
-    { title: "검색 🔎", onClick: () => setPage("stock-data") },
-    { title: "관심 목록 ⭐", onClick: () => setPage("watchlist") },
-    { title: "일별잔고수익률", onClick: () => setPage("daily-balance") },
-    { title: "로그인", onClick: () => handleLogin() },
+    {
+      title: "검색",
+      onClick: () => setPage("stock-data"),
+      icon: <Search className="w-4 h-4" />,
+    },
+    {
+      title: "보유 종목",
+      onClick: () => setPage("holdings"),
+      icon: <ShoppingCart className="w-4 h-4" />,
+    },
+    {
+      title: "관심 목록",
+      onClick: () => setPage("watchlist"),
+      icon: <Star className="w-4 h-4" />,
+    },
+    {
+      title: "일별잔고",
+      onClick: () => setPage("daily-balance"),
+      icon: <TrendingUp className="w-4 h-4" />,
+    },
   ];
 
   const handleLogin = async () => {
@@ -23,7 +42,7 @@ const Main = () => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-blue-50 to-purple-50">
+    <div className="h-full flex flex-col relative">
       {/* 헤더 섹션 */}
       <div className="text-center py-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">📈 주식 투자</h1>
@@ -40,16 +59,20 @@ const Main = () => {
               key={item.title}
               title={item.title}
               onClick={item.onClick}
+              icon={item.icon}
             />
           ))}
         </div>
       </div>
 
       {/* 푸터 */}
-      <div className="text-center py-4">
+      <div className="text-center p-4 absolute bottom-0 left-0 right-0">
         <p className="text-xs text-gray-400">
           💡 현명한 투자는 정보에서 시작됩니다
         </p>
+        <Button variant="outline" className="w-full mt-4" onClick={handleLogin}>
+          로그인
+        </Button>
       </div>
     </div>
   );
@@ -57,31 +80,36 @@ const Main = () => {
 
 const MainItem = ({
   title,
+  icon,
   onClick,
 }: {
   title: string;
+  icon: React.ReactNode;
   onClick: () => void;
 }) => {
   const getButtonStyle = (title: string) => {
     if (title.includes("검색"))
-      return "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700";
+      return "bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200";
+    if (title.includes("보유"))
+      return "bg-gradient-to-r from-pink-50 to-pink-100 hover:from-pink-100 hover:to-pink-200";
     if (title.includes("관심"))
-      return "bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600";
+      return "bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-200";
     if (title.includes("잔고"))
-      return "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700";
-    if (title.includes("로그인"))
-      return "bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700";
+      return "bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200";
     return "bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700";
   };
 
   return (
     <div
-      className={`font-semibold cursor-pointer p-4 rounded-xl min-w-[140px] h-[70px] flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 ${getButtonStyle(
+      className={`font-semibold cursor-pointer p-4 rounded-xl min-w-[140px] h-[70px] flex items-center justify-center shadow-md text-gray-800 hover:shadow-xl transition-all duration-200 hover:scale-102 border-1 border-gray-100  ${getButtonStyle(
         title
       )}`}
       onClick={onClick}
     >
-      <span className="text-center text-sm">{title}</span>
+      <span className="text-center text-sm flex items-center justify-center gap-2">
+        {title}
+        {icon}
+      </span>
     </div>
   );
 };

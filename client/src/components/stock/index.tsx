@@ -1,13 +1,14 @@
 import { cn } from "@/lib/utils";
 import React from "react";
 import DailyBalance from "./page/daily-balance";
-import { ArrowLeft } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import Main from "./page/stock-main";
 import { useStockPage } from "@/hooks/use-stock-page";
 import StockData from "./page/stock-data";
 import StockDetail from "./page/stock-detail";
 import Watchlist from "./page/watchlist";
 import StockTrade from "./page/stock-trade";
+import Holdings from "./page/holdings";
 
 const StockContainer = ({ className }: { className: string }) => {
   const { page, setPage } = useStockPage();
@@ -21,7 +22,8 @@ const StockContainer = ({ className }: { className: string }) => {
     >
       <div className="flex items-center py-2 absolute top-0 left-0 w-full z-10">
         {page !== "main" && (
-          <ArrowLeft
+          // <- 이거 말고 < 이거
+          <ChevronLeft
             onClick={() => {
               if (page === "stock-trade") {
                 setPage("stock-detail");
@@ -32,18 +34,16 @@ const StockContainer = ({ className }: { className: string }) => {
             className="absolute left-4 top-4 z-11 cursor-pointer"
           />
         )}
-        <div className="text-2xl font-bold text-center w-full ">
-          {page.toUpperCase()}
-        </div>
       </div>
 
-      <div className="h-full p-4 py-16">
+      <div className="h-full p-4 py-16 bg-gradient-to-br from-blue-50 via-white to-purple-50">
         {page === "main" && <Main />}
         {page === "daily-balance" && <DailyBalance />}
         {page === "stock-data" && <StockData />}
         {page === "stock-detail" && <StockDetail />}
         {page === "watchlist" && <Watchlist />}
         {page === "stock-trade" && <StockTrade />}
+        {page === "holdings" && <Holdings />}
       </div>
     </div>
   );

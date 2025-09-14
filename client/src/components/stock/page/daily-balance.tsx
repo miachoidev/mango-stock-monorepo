@@ -11,14 +11,14 @@ const DailyBalance = () => {
 
   if (!data) {
     return (
-      <div className="h-full bg-gray-100 flex flex-col justify-center items-center">
+      <div className="h-fullflex flex-col justify-center items-center">
         <div className="text-gray-500">데이터를 불러오는 중...</div>
       </div>
     );
   }
 
   return (
-    <div className="h-full bg-white flex flex-col p-4">
+    <div className="h-full flex flex-col p-4">
       <div className="text-lg font-bold mb-4 text-center">일별 잔고 현황</div>
       <div className="flex flex-col space-y-2">
         <BalanceItem label="일자" value={data.dt} />
