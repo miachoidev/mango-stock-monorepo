@@ -2,7 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useStockPage } from "@/hooks/use-stock-page";
 import { StockChartDay } from "@/types/kioom";
-import { KIOOM_API, OrderRequest } from "@/utils/api/kiwoom.api";
+import {
+  KIWOOM_TRADING_API,
+  TradingRequest,
+} from "@/utils/api/kiwoom-trading.api";
+import { KIOOM_API } from "@/utils/api/kiwoom.api";
 import { useQuery } from "@tanstack/react-query";
 import { DollarSign, ShoppingCart, TrendingUp } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -113,11 +117,15 @@ export default function StockTrade() {
       return;
     }
 
-    const orderRequest: OrderRequest = {
+    const orderRequest: TradingRequest = {
+      dmst_stex_tp: "KRX",
       stk_cd: stock.code,
-      ord_qty: quantity,
-      ord_prc: priceType === "market" ? currentPriceInfo.currentPrice : price,
-      ord_tp: priceType === "market" ? "03" : "00", // 03: 시장가, 00: 지정가
+      ord_qty: quantity.toString(),
+      ord_uv:
+        priceType === "market"
+          ? currentPriceInfo.currentPrice.toString()
+          : price.toString(),
+      trde_tp: priceType === "market" ? "3" : "0", // 03: 시장가, 00: 지정가
     };
 
     setIsTrading(true);
@@ -125,18 +133,19 @@ export default function StockTrade() {
     try {
       const response =
         tradeType === "buy"
-          ? await KIOOM_API.buyStock(orderRequest)
-          : await KIOOM_API.sellStock(orderRequest);
+          ? await KIWOOM_TRADING_API.buyStock(orderRequest)
+          : await KIWOOM_TRADING_API.sellStock(orderRequest);
+      console.log("주문 응답:", response);
 
-      if (response.success) {
-        toast.success(response.message);
+      if (response.return_code === 0) {
+        toast.success(response.return_msg);
         // 입력값 초기화
         setQuantity(1);
         if (priceType === "limit") {
           setPrice(currentPriceInfo.currentPrice);
         }
       } else {
-        toast.error(response.message);
+        toast.error(response.return_msg);
       }
     } catch (error) {
       toast.error("주문 처리 중 오류가 발생했습니다.");
