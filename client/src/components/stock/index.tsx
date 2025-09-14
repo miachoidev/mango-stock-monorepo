@@ -6,8 +6,8 @@ import Main from "./page/stock-main";
 import { useStockPage } from "@/hooks/use-stock-page";
 import StockData from "./page/stock-data";
 import StockDetail from "./page/stock-detail";
+import Watchlist from "./page/watchlist";
 
-type PageType = "daily-balance" | "main" | "stock-data";
 
 const StockContainer = ({ className }: { className: string }) => {
   const { page, setPage } = useStockPage();
@@ -36,6 +36,7 @@ const StockContainer = ({ className }: { className: string }) => {
         {page === "daily-balance" && <DailyBalance />}
         {page === "stock-data" && <StockData />}
         {page === "stock-detail" && <StockDetail />}
+        {page === "watchlist" && <Watchlist />}
       </div>
     </div>
   );

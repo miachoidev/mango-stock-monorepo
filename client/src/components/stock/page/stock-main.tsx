@@ -1,16 +1,29 @@
 import { useStockPage } from "@/hooks/use-stock-page";
+import { kiwoomLogin } from "@/utils/api/kiwoom-login";
 import { STOCK_DATA_API } from "@/utils/api/stock-data";
+import { useRouter } from "next/navigation";
 import React from "react";
+import Cookies from "js-cookie";
 
 const Main = () => {
   const { setPage, setStock } = useStockPage();
 
   const list = [
     { title: "검색 🔎", onClick: () => setPage("stock-data") },
+    { title: "관심 목록 ⭐", onClick: () => setPage("watchlist") },
     { title: "일별잔고수익률", onClick: () => setPage("daily-balance") },
+    { title: "로그인", onClick: () => handleLogin() },
   ];
 
   const popularStocks = STOCK_DATA_API.getPopularStocks();
+
+  const handleLogin = async () => {
+    const token = await kiwoomLogin();
+    if (token) {
+      Cookies.set("token", token);
+      toast;
+    }
+  };
 
   return (
     <div className="h-full flex flex-col">
