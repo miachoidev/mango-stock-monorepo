@@ -233,12 +233,116 @@ def get_stock_program_trading_status(
         return {"error": f"종목별프로그램매매현황 조회 실패: {str(e)}"}
 
 
+def get_stock_daily_program_trading_trend(
+    token: str,
+    stk_cd: str,
+    strt_dt: str,
+    end_dt: str,
+    cont_yn: Optional[str] = None,
+    next_key: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    종목일별프로그램매매추이를 조회합니다.
+
+    Args:
+        token: 키움증권 접근토큰
+        stk_cd: 종목코드 (예: "005930" for 삼성전자)
+        strt_dt: 시작일자 (YYYYMMDD 형식, 예: "20241101")
+        end_dt: 종료일자 (YYYYMMDD 형식, 예: "20241125")
+        cont_yn: 연속조회여부 (Y/N)
+        next_key: 연속조회키
+
+    Returns:
+        종목일별프로그램매매추이 딕셔너리
+    """
+    try:
+        if not token:
+            return {"error": "키움증권 접근토큰이 필요합니다."}
+
+        if not stk_cd:
+            return {"error": "종목코드가 필요합니다."}
+
+        if not strt_dt:
+            return {"error": "시작일자가 필요합니다."}
+
+        if not end_dt:
+            return {"error": "종료일자가 필요합니다."}
+
+        url = f"{BASE_URL}/api/dostk/stkinfo"
+
+        headers = {
+            "api-id": "ka90013",
+            "authorization": f"Bearer {token}",
+            "Content-Type": "application/json;charset=UTF-8",
+        }
+
+        # 연속조회 헤더 추가
+        if cont_yn:
+            headers["cont-yn"] = cont_yn
+        if next_key:
+            headers["next-key"] = next_key
+
+        data = {
+            "stk_cd": stk_cd,
+            "strt_dt": strt_dt,
+            "end_dt": end_dt,
+        }
+
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+
+        result = response.json()
+
+        # 응답 데이터 정리
+        program_trading_trend = {
+            "success": True,
+            "stock_code": stk_cd,
+            "start_date": strt_dt,
+            "end_date": end_dt,
+            "program_trading_list": [],
+        }
+
+        # 종목일별프로그램매매추이 리스트 처리
+        trading_list = result.get("stk_prm_trde_trnd", [])
+        for trading in trading_list:
+            trading_info = {
+                "date": trading.get("dt"),
+                "current_price": trading.get("cur_prc"),
+                "fluctuation_signal": trading.get("flu_sig"),
+                "previous_contrast": trading.get("pred_pre"),
+                "buy_contract_quantity": trading.get("buy_cntr_qty"),
+                "buy_contract_amount": trading.get("buy_cntr_amt"),
+                "sell_contract_quantity": trading.get("sel_cntr_qty"),
+                "sell_contract_amount": trading.get("sel_cntr_amt"),
+                "net_buy_amount": trading.get("netprps_prica"),
+                "total_trading_ratio": trading.get("all_trde_rt"),
+            }
+            program_trading_trend["program_trading_list"].append(trading_info)
+
+        # 연속조회 정보 추가
+        program_trading_trend["cont_yn"] = response.headers.get("cont-yn")
+        program_trading_trend["next_key"] = response.headers.get("next-key")
+        program_trading_trend["return_code"] = result.get("return_code")
+        program_trading_trend["return_msg"] = result.get("return_msg")
+
+        return program_trading_trend
+
+    except requests.exceptions.RequestException as e:
+        return {"error": f"API 요청 실패: {str(e)}"}
+    except Exception as e:
+        return {"error": f"종목일별프로그램매매추이 조회 실패: {str(e)}"}
+
+
 # 도구 생성
 kiwoom_stock_basic_info_tool = FunctionTool(get_stock_basic_info)
 kiwoom_stock_program_trading_tool = FunctionTool(get_stock_program_trading_status)
+kiwoom_stock_daily_program_trading_trend_tool = FunctionTool(
+    get_stock_daily_program_trading_trend
+)
 
 # 도구들
 KIWOOM_STOCK_INFO_TOOLS = [
     kiwoom_stock_basic_info_tool,
     kiwoom_stock_program_trading_tool,
+    kiwoom_stock_daily_program_trading_trend_tool,
 ]
