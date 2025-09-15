@@ -1,4 +1,4 @@
-from typing import List, Optional, Any, Dict
+from typing import List, Optional, Any
 from dotenv import load_dotenv
 from google.adk.runners import Runner
 from fastapi import FastAPI, HTTPException
@@ -52,6 +52,7 @@ class ChatRequest(BaseModel):
     message: str
     session_id: Optional[str] = None
     instruction: Optional[str] = None
+    stock_code: Optional[str] = None  # 종목 코드 추가
 
 
 class ChatResponse(BaseModel):
@@ -113,7 +114,20 @@ async def chat(request: ChatRequest):
 
         runner.agent.instruction = request.instruction
 
-        content = types.Content(role="user", parts=[types.Part(text=request.message)])
+        # 종목 코드가 있으면 메시지에 추가
+        message_text = request.message
+        if request.stock_code:
+            message_text = f"종목코드: {request.stock_code}\n{request.message}"
+        else:
+            # 메시지에서 종목코드 패턴 찾기 (6자리 숫자)
+            import re
+
+            stock_code_match = re.search(r"\b(\d{6})\b", request.message)
+            if stock_code_match:
+                stock_code = stock_code_match.group(1)
+                message_text = f"종목코드: {stock_code}\n{request.message}"
+
+        content = types.Content(role="user", parts=[types.Part(text=message_text)])
 
         # 비동기로 실행
         messages = []
@@ -195,6 +209,46 @@ async def get_user_sessions(user_id: str):
         return SessionsListResponse(sessions=session_infos)
     except Exception as e:
         print(f"Sessions list error: {str(e)}")
+        print(traceback.format_exc())
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": str(e),
+                "type": type(e).__name__,
+                "traceback": traceback.format_exc(),
+            },
+        )
+
+
+@app.post("/api/v1/adk/test/stock-analysis")
+async def test_stock_analysis(stock_code: str, user_id: str = "test_user"):
+    """종목 분석 테스트용 엔드포인트"""
+    try:
+        # 기존 chat 로직 재사용
+        session = await session_service.create_session(
+            app_name=APP_NAME, user_id=user_id
+        )
+
+        runner.agent.instruction = None
+
+        message_text = f"종목코드: {stock_code}\n이 종목 분석해줘"
+        content = types.Content(role="user", parts=[types.Part(text=message_text)])
+
+        messages = []
+        async for event in runner.run_async(
+            user_id=user_id, session_id=session.id, new_message=content
+        ):
+            messages.append(event)
+
+        return {
+            "success": True,
+            "stock_code": stock_code,
+            "session_id": session.id,
+            "messages": messages,
+        }
+
+    except Exception as e:
+        print(f"Test error: {str(e)}")
         print(traceback.format_exc())
         raise HTTPException(
             status_code=500,

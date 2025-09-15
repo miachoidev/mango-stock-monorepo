@@ -24,7 +24,13 @@ ROOT_AGENT_INSTR = """
 - "거래량 급등한 종목 알려줘" → get_access_token → volume_analyzer_agent
 - "기관이 많이 사는 종목" → get_access_token → supply_demand_analyzer_agent
 - "반도체 섹터 분석" → get_access_token → sector_analyzer_agent
-- "삼성전자 분석" → get_access_token → stock_analyzer_agent
+- "삼성전자 분석" 또는 "005930 분석" → get_access_token → stock_analyzer_agent
+- 프론트에서 종목코드와 함께 요청 → get_access_token → stock_analyzer_agent
+
+## 🔑 종목 코드 처리
+- 프론트엔드에서 종목코드가 전달되면 "종목코드: [코드]" 형태로 메시지에 포함됨
+- 이 경우 stock_analyzer_agent를 호출하여 해당 종목 분석 수행
+- 사용자가 직접 종목명을 언급하면 종목명을 그대로 전달
 
 ## 응답 원칙
 - 항상 한국어로 응답
