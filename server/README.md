@@ -33,7 +33,28 @@ GOOGLE_CLOUD_PROJECT=YOUR_PROJECT_ID
 GOOGLE_API_KEY=YOUR_API_KEY
 ```
 
-### 3. 프로젝트 설정 및 실행
+### 3. 키움 API Key 발급 방법
+
+```bash
+# .env 파일에 키움 API 키 추가
+# KIWOOM_APPKEY=your_kiwoom_appkey_here
+# KIWOOM_SECRETKEY=your_kiwoom_secretkey_here
+```
+
+**키움 API Key 발급 방법:**
+
+1. [키움 REST API 가이드](https://openapi.kiwoom.com/guide/apiguide?dummyVal=0) 접속
+2. 키움증권 계정으로 로그인
+3. API 사용신청 진행
+4. 발급받은 App Key와 Secret Key를 `.env` 파일에 추가:
+
+```
+KIWOOM_APPKEY=YOUR_APP_KEY
+KIWOOM_SECRETKEY=YOUR_SECRET_KEY
+```
+
+
+### 4. 프로젝트 설정 및 실행
 
 ```bash
 # Python 3.12 설치
