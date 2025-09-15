@@ -4,9 +4,8 @@
 """
 
 from google.adk.tools import FunctionTool
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, Optional
 import requests
-import json
 import os
 
 # 환경변수에서 키움증권 설정 가져오기

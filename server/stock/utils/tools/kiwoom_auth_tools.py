@@ -7,9 +7,7 @@
 from google.adk.tools import FunctionTool
 from typing import Dict, Any
 import requests
-import json
 import os
-from datetime import datetime, timedelta
 
 # 환경변수에서 키움증권 API 키 가져오기
 KIWOOM_APPKEY = os.getenv("KIWOOM_APPKEY")

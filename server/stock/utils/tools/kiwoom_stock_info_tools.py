@@ -1,6 +1,7 @@
 """
 키움증권 종목 정보 조회 관련 도구들
 - 주식기본정보요청 (ka10001)
+- 종목별프로그램매매현황요청 (ka90004)
 """
 
 from google.adk.tools import FunctionTool
@@ -125,8 +126,119 @@ def get_stock_basic_info(
         return {"error": f"주식기본정보 조회 실패: {str(e)}"}
 
 
+def get_stock_program_trading_status(
+    token: str,
+    dt: str,
+    mrkt_tp: str,
+    stex_tp: str,
+    cont_yn: Optional[str] = None,
+    next_key: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    종목별프로그램매매현황을 조회합니다.
+
+    Args:
+        token: 키움증권 접근토큰
+        dt: 일자 (YYYYMMDD 형식, 예: "20241125")
+        mrkt_tp: 시장구분 (P00101:코스피, P10102:코스닥)
+        stex_tp: 거래소구분 (1:KRX, 2:NXT, 3:통합)
+        cont_yn: 연속조회여부 (Y/N)
+        next_key: 연속조회키
+
+    Returns:
+        종목별프로그램매매현황 딕셔너리
+    """
+    try:
+        if not token:
+            return {"error": "키움증권 접근토큰이 필요합니다."}
+
+        if not dt:
+            return {"error": "일자가 필요합니다."}
+
+        if not mrkt_tp:
+            return {"error": "시장구분이 필요합니다."}
+
+        if not stex_tp:
+            return {"error": "거래소구분이 필요합니다."}
+
+        url = f"{BASE_URL}/api/dostk/stkinfo"
+
+        headers = {
+            "api-id": "ka90004",
+            "authorization": f"Bearer {token}",
+            "Content-Type": "application/json;charset=UTF-8",
+        }
+
+        # 연속조회 헤더 추가
+        if cont_yn:
+            headers["cont-yn"] = cont_yn
+        if next_key:
+            headers["next-key"] = next_key
+
+        data = {
+            "dt": dt,
+            "mrkt_tp": mrkt_tp,
+            "stex_tp": stex_tp,
+        }
+
+        response = requests.post(url, headers=headers, json=data)
+        response.raise_for_status()
+
+        result = response.json()
+
+        # 응답 데이터 정리
+        program_trading_info = {
+            "success": True,
+            "date": dt,
+            "market_type": mrkt_tp,
+            "exchange_type": stex_tp,
+            "total_buy_quantity": result.get("tot_1"),
+            "total_buy_amount": result.get("tot_2"),
+            "total_sell_quantity": result.get("tot_3"),
+            "total_sell_amount": result.get("tot_4"),
+            "total_net_buy_amount": result.get("tot_5"),
+            "total_6": result.get("tot_6"),
+            "stock_program_trading_list": [],
+        }
+
+        # 종목별프로그램매매현황 리스트 처리
+        stock_list = result.get("stk_prm_trde_prst", [])
+        for stock in stock_list:
+            stock_info = {
+                "stock_code": stock.get("stk_cd"),
+                "stock_name": stock.get("stk_nm"),
+                "current_price": stock.get("cur_prc"),
+                "fluctuation_signal": stock.get("flu_sig"),
+                "previous_contrast": stock.get("pred_pre"),
+                "buy_contract_quantity": stock.get("buy_cntr_qty"),
+                "buy_contract_amount": stock.get("buy_cntr_amt"),
+                "sell_contract_quantity": stock.get("sel_cntr_qty"),
+                "sell_contract_amount": stock.get("sel_cntr_amt"),
+                "net_buy_amount": stock.get("netprps_prica"),
+                "total_trading_ratio": stock.get("all_trde_rt"),
+            }
+            program_trading_info["stock_program_trading_list"].append(stock_info)
+
+        # 연속조회 정보 추가
+        program_trading_info["cont_yn"] = response.headers.get("cont-yn")
+        program_trading_info["next_key"] = response.headers.get("next-key")
+        program_trading_info["return_code"] = result.get("return_code")
+        program_trading_info["return_msg"] = result.get("return_msg")
+
+        return program_trading_info
+
+    except requests.exceptions.RequestException as e:
+        return {"error": f"API 요청 실패: {str(e)}"}
+    except Exception as e:
+        return {"error": f"종목별프로그램매매현황 조회 실패: {str(e)}"}
+
+
 # 도구 생성
 kiwoom_stock_basic_info_tool = FunctionTool(get_stock_basic_info)
+kiwoom_stock_program_trading_tool = FunctionTool(get_stock_program_trading_status)
 
 # 도구들
-KIWOOM_STOCK_INFO_TOOLS = [kiwoom_stock_basic_info_tool]
+KIWOOM_STOCK_INFO_TOOLS = [
+    kiwoom_stock_basic_info_tool,
+    kiwoom_stock_program_trading_tool,
+]
