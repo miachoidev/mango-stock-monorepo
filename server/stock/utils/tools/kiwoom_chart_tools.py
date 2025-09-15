@@ -21,7 +21,7 @@ BASE_URL = "https://mockapi.kiwoom.com" if KIWOOM_IS_MOCK else "https://api.kiwo
 
 def get_stock_daily_chart(
     stk_cd: str,
-    base_dt: str,
+    base_dt: Optional[str] = None,
     upd_stkpc_tp: str = "1",
     cont_yn: Optional[str] = None,
     next_key: Optional[str] = None,
@@ -29,18 +29,26 @@ def get_stock_daily_chart(
 ) -> Dict[str, Any]:
     """
     키움증권 주식일봉차트조회요청 API (ka10081)
+    base_dt가 제공되지 않으면 오늘 날짜를 기준으로 조회하고, 최근 60일 데이터만 반환합니다.
 
     Args:
         stk_cd: 종목코드 (예: "005930")
-        base_dt: 기준일자 (YYYYMMDD 형식, 예: "20241108")
+        base_dt: 기준일자 (YYYYMMDD 형식, 예: "20241108"). None이면 오늘 날짜 기준으로 조회
         upd_stkpc_tp: 수정주가구분 (0 or 1, 기본값: "1")
         cont_yn: 연속조회여부 (선택사항)
         next_key: 연속조회키 (선택사항)
         authorization: 접근토큰 (선택사항)
 
     Returns:
-        Dict: API 응답 데이터
+        Dict: API 응답 데이터 (최근 60일로 제한)
     """
+    from datetime import datetime, timedelta
+
+    # base_dt가 제공되지 않으면 오늘 날짜를 기준으로 조회
+    if base_dt is None:
+        today = datetime.now()
+        base_dt = today.strftime("%Y%m%d")
+
     url = f"{BASE_URL}/api/dostk/chart"
 
     headers = {"api-id": "ka10081", "Content-Type": "application/json;charset=UTF-8"}
@@ -59,7 +67,25 @@ def get_stock_daily_chart(
     try:
         response = requests.post(url, headers=headers, json=payload)
         response.raise_for_status()
-        return response.json()
+        result = response.json()
+
+        # 응답에서 최근 60일 데이터만 제한
+        if "error" not in result and "stk_dt_pole_chart_qry" in result:
+            chart_data = result["stk_dt_pole_chart_qry"]
+            if len(chart_data) > 60:
+                result["stk_dt_pole_chart_qry"] = chart_data[:60]  # 최근 60일만 유지
+
+        # 메타데이터 추가
+        if "error" not in result:
+            result["query_info"] = {
+                "stock_code": stk_cd,
+                "start_date": base_dt,
+                "end_date": datetime.now().strftime("%Y%m%d"),
+                "data_count": len(result.get("stk_dt_pole_chart_qry", [])),
+                "limited_to_60_days": True,
+            }
+
+        return result
     except requests.exceptions.RequestException as e:
         return {
             "error": f"API 요청 실패: {str(e)}",
