@@ -1,38 +1,29 @@
-import { ChatResponse } from "../types/chat-message";
-import { SessionsListResponse } from "../types/session";
+import axios from "axios";
+import { ChatResponse } from "../../types/chat-message";
+import { SessionsListResponse } from "../../types/session";
 
 // API 기본 설정
 const API_BASE_URL = "http://localhost:8000";
 
 // 채팅 API 호출 함수
-export async function sendChatMessage(
-  message: string,
-  session_id?: string
-): Promise<ChatResponse> {
+export async function sendChatMessage(message: string, session_id?: string) {
   try {
-    const body = {
-      user_id: "stock_user",
-      message: message,
-      ...(session_id && { session_id }),
-    };
+    const requestBody = {
+      message,
+      session_id,
+    } as { message: string; session_id?: string };
 
-    const response = await fetch(`${API_BASE_URL}/api/v1/adk/chat`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    const response = await axios.post("/api/adk", requestBody);
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      console.error("채팅 실패:", response.data);
+      return null;
     }
-
-    const data: ChatResponse = await response.json();
-    return data;
   } catch (error) {
-    console.error("채팅 API 호출 오류:", error);
-    throw error;
+    console.error("요청 실패:", error);
+    return null;
   }
 }
 

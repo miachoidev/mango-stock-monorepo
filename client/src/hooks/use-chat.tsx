@@ -1,4 +1,4 @@
-import { extractMessageText, sendChatMessage } from "@/lib/api";
+import { extractMessageText, sendChatMessage } from "@/utils/api/adk.api";
 import { LocalMessage } from "@/types/chat-message";
 import { useEffect, useRef } from "react";
 
@@ -95,26 +95,25 @@ const useChat = (initialSessionId?: string) => {
       setPrompt("");
 
       // 어시스턴트 메시지 플레이스홀더 추가
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: newMessageId + 1,
-          role: "assistant",
-          content: "",
-        },
-      ]);
-
-      return;
 
       try {
         // 세션 ID가 있으면 포함해서 API 호출
 
         const response = await sendChatMessage(userMessage, sessionId);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: newMessageId + 1,
+            role: "assistant",
+            content: "",
+          },
+        ]);
         const responseText = extractMessageText(response);
 
         // 세션 ID가 응답에 포함되고 현재 URL에 세션 ID가 없는 경우 주소만 변경
         if (response.session_id && !sessionId) {
-          window.history.pushState(null, "", `/chat/${response.session_id}`);
+          // window.history.pushState(null, "", `/chat/${response.session_id}`);
+          setSessionId(response.session_id);
         }
 
         // 스트리밍 효과로 응답 표시
