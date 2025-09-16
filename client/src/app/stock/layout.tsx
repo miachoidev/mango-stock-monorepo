@@ -34,8 +34,12 @@ export default function ChatLayout({
           <Settings className="text-white" />
         </Button>
 
-        <div className={`w-full h-full ${stockOpen ? "block" : "hidden"}`}>
-          {children}
+        <div
+          className={`w-full h-full stock-container relative ${
+            stockOpen ? "block" : "hidden"
+          }`}
+        >
+          <div className="stock-container-inner">{children}</div>
         </div>
       </div>
     </div>

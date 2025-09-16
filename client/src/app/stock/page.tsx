@@ -12,25 +12,21 @@ const Main = () => {
   const list = [
     {
       title: "검색",
-      // onClick: () => router.push("/stock/stock-data"),
       href: "/stock/stock-data",
       icon: <Search className="w-4 h-4" />,
     },
     {
       title: "보유 종목",
-      // onClick: () => router.push("/stock/holdings"),
       href: "/stock/holdings",
       icon: <ShoppingCart className="w-4 h-4" />,
     },
     {
       title: "관심 목록",
-      // onClick: () => router.push("/stock/watchlist"),
       href: "/stock/watchlist",
       icon: <Star className="w-4 h-4" />,
     },
     {
       title: "일별잔고",
-      // onClick: () => router.push("/stock/daily-balance"),
       href: "/stock/daily-balance",
       icon: <TrendingUp className="w-4 h-4" />,
     },

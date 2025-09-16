@@ -71,3 +71,18 @@
     @apply bg-background text-foreground;
   }
 }
+
+.stock-container {
+  background-color: #0c1015;
+}
+.stock-container-inner {
+  /* 동그라미 그라데이션 */
+  background: radial-gradient(
+    ellipse 150% 700px at 50% 8%,
+    #21527fb1,
+    #0c1015,
+    transparent 100%
+  );
+  width: 100%;
+  height: 100%;
+}

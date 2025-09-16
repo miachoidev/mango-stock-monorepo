@@ -11,7 +11,7 @@ const DailyBalance = () => {
 
   if (!data) {
     return (
-      <div className="h-fullflex flex-col justify-center items-center">
+      <div className="h-full flex flex-col justify-center items-center">
         <div className="text-gray-500">데이터를 불러오는 중...</div>
       </div>
     );
