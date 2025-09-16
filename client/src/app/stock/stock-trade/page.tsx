@@ -331,7 +331,7 @@ export default function StockTrade() {
           <Button
             onClick={handleTrade}
             disabled={isTrading || !currentPriceInfo}
-            className={`w-full h-12 font-bold text-lg ${
+            className={`w-full h-12 font-bold text-lg gradient-button ${
               tradeType === "buy"
                 ? "bg-red-500 hover:bg-red-600 text-white"
                 : "bg-blue-500 hover:bg-blue-600 text-white"

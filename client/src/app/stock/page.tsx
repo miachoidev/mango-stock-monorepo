@@ -4,33 +4,12 @@ import React from "react";
 import Cookies from "js-cookie";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Search, Star } from "lucide-react";
-import { ShoppingCart, TrendingUp } from "lucide-react";
-import Link from "next/link";
+import { LucideRocket, Search, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
+import HoldingList from "@/components/page/holding/holding-list";
 
 const Main = () => {
-  const list = [
-    {
-      title: "검색",
-      href: "/stock/stock-data",
-      icon: <Search className="w-4 h-4" />,
-    },
-    {
-      title: "보유 종목",
-      href: "/stock/holdings",
-      icon: <ShoppingCart className="w-4 h-4" />,
-    },
-    {
-      title: "관심 목록",
-      href: "/stock/watchlist",
-      icon: <Star className="w-4 h-4" />,
-    },
-    {
-      title: "일별잔고",
-      href: "/stock/daily-balance",
-      icon: <TrendingUp className="w-4 h-4" />,
-    },
-  ];
+  const router = useRouter();
 
   const handleLogin = async () => {
     const token = await kiwoomLogin();
@@ -43,70 +22,84 @@ const Main = () => {
   return (
     <div className="h-full flex flex-col relative">
       {/* 헤더 섹션 */}
-      <div className="text-center py-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">📈 주식 투자</h1>
+      <div className="flex justify-start py-6">
+        <h1 className="text-xl font-bold text-white mb-2">
+          허들러 주식 투자 에이전트
+        </h1>
       </div>
 
-      {/* 메뉴 버튼 섹션 */}
-      <div className="px-4">
-        <div className="grid grid-cols-2 gap-3 max-w-[320px] mx-auto">
-          {list.map((item) => (
-            <MainItem
-              key={item.title}
-              title={item.title}
-              href={item.href}
-              icon={item.icon}
-            />
-          ))}
-        </div>
+      <div className="flex justify-around w-full">
+        <MainItem onClick={() => router.push("/stock/stock-data")} />
+        <MainItem2 onClick={() => router.push("/stock/watchlist")} />
+      </div>
+      <div className="w-full px-6 mt-10">
+        <MainItem3 />
       </div>
 
-      {/* 푸터 */}
-      <div className="text-center p-4 absolute bottom-0 left-0 right-0">
+      <div className="w-full px-6 mt-10">
+        <HoldingList />
+      </div>
+
+      {/* <div className="text-center p-4 absolute bottom-0 left-0 right-0">
         <p className="text-xs text-gray-400">
           💡 현명한 투자는 정보에서 시작됩니다
         </p>
         <Button variant="outline" className="w-full mt-4" onClick={handleLogin}>
           로그인
         </Button>
+      </div> */}
+    </div>
+  );
+};
+
+const MainItem = ({ onClick }: { onClick: () => void }) => {
+  return (
+    <div className="main-item-card" onClick={onClick}>
+      <div className="main-item-card-inner">
+        <div className="flex items-center justify-between h-8">
+          <div className="text-xl font-semibold">검색</div>
+          <div className="bg-[#35363D] rounded-full w-7 h-7 flex items-center justify-center">
+            <Search className="w-3 h-3 text-white" />
+          </div>
+        </div>
+        <div className="text-xs text-gray-400 mt-7">주식 검색</div>
+        <div className="text-md text-white mt-1">인기 주식 & 인기 채권</div>
+      </div>
+    </div>
+  );
+};
+const MainItem2 = ({ onClick }: { onClick: () => void }) => {
+  return (
+    <div className="main-item-card" onClick={onClick}>
+      <div className="main-item-card-inner">
+        <div className="flex items-center justify-between h-8">
+          <div className="text-xl font-semibold">관심 목록</div>
+          <div className="bg-[#35363D] rounded-full w-7 h-7 flex items-center justify-center">
+            <Star className="w-3 h-3 text-white" />
+          </div>
+        </div>
+        <div className="text-xs text-gray-400 mt-7">주식 골라보기</div>
+        <div className="text-md text-white mt-1">관심 목록 관리</div>
       </div>
     </div>
   );
 };
 
-const MainItem = ({
-  title,
-  icon,
-  href,
-}: {
-  title: string;
-  icon: React.ReactNode;
-  href: string;
-}) => {
-  const getButtonStyle = (title: string) => {
-    if (title.includes("검색"))
-      return "bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200";
-    if (title.includes("보유"))
-      return "bg-gradient-to-r from-pink-50 to-pink-100 hover:from-pink-100 hover:to-pink-200";
-    if (title.includes("관심"))
-      return "bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-200";
-    if (title.includes("잔고"))
-      return "bg-gradient-to-r from-green-50 to-green-100 hover:from-green-100 hover:to-green-200";
-    return "bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700";
-  };
-
+const MainItem3 = () => {
   return (
-    <Link
-      className={`font-semibold cursor-pointer p-4 rounded-xl min-w-[140px] h-[70px] flex items-center justify-center shadow-md text-gray-800 hover:shadow-xl transition-all duration-200 hover:scale-102 border-1 border-gray-100  ${getButtonStyle(
-        title
-      )}`}
-      href={href}
-    >
-      <span className="text-center text-sm flex items-center justify-center gap-2">
-        {title}
-        {icon}
-      </span>
-    </Link>
+    <div className="w-full bg-[#19212A] rounded-2xl p-6 text-white">
+      <div className="flex items-center justify-between h-10">
+        <div className="text-xl font-semibold">종목 추천</div>
+        <div className="bg-[#35363D] rounded-full w-7 h-7 flex items-center justify-center">
+          <LucideRocket className="w-4 h-4 text-white" />
+        </div>
+      </div>
+      <div className="text-sm text-gray-400 mt-6">AI Agent 추천 종목</div>
+
+      <Button className="w-full mt-4 bg-[#1578D8] rounded-full hover:bg-[#1578D8]/80">
+        추천 받기
+      </Button>
+    </div>
   );
 };
 

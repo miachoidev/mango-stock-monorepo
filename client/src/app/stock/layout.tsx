@@ -1,9 +1,10 @@
 "use client";
 import React, { useState } from "react";
-import { Settings } from "lucide-react";
+import { ChevronLeft, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import ChatMain from "@/components/chat/chat-main";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function ChatLayout({
   children,
@@ -11,6 +12,8 @@ export default function ChatLayout({
   children: React.ReactNode;
 }) {
   const [stockOpen, setStockOpen] = useState(true);
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <div
@@ -39,7 +42,23 @@ export default function ChatLayout({
             stockOpen ? "block" : "hidden"
           }`}
         >
-          <div className="stock-container-inner">{children}</div>
+          <div className="flex items-center py-2 absolute top-0 left-0 w-full z-10">
+            {pathname !== "/stock" && (
+              <ChevronLeft
+                onClick={() => {
+                  if (pathname === "/detail/[code]") {
+                    router.push("/detail/[code]");
+                    return;
+                  }
+                  router.push("/stock");
+                }}
+                className="cursor-pointer text-white"
+              />
+            )}
+          </div>
+          <div className="stock-container-inner h-full w-full px-[10%] min-w-[600px] overflow-y-auto">
+            {children}
+          </div>
         </div>
       </div>
     </div>
