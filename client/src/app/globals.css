@@ -96,10 +96,20 @@
   cursor: pointer;
   width: 250px;
   height: 150px;
-  &:hover {
-    transform: scale(1.01);
-    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2);
-  }
+  transition: all 0.3s ease;
+}
+
+.main-item-card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2);
+}
+
+.main-item-card:active {
+  transform: scale(0.98);
+}
+
+.main-item-card * {
+  pointer-events: none;
 }
 
 .main-item-card-inner {

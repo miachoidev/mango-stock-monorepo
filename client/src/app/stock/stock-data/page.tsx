@@ -1,14 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { STOCK_DATA_API } from "@/utils/api/stock-data";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Heart, HeartIcon, Search, RotateCcw } from "lucide-react";
+import { Heart, HeartIcon, Search } from "lucide-react";
 import { WISHLIST_API } from "@/utils/api/wishlist.api";
 import { StockItem } from "@/types/stock";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
 
 const StockData = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -36,15 +33,6 @@ const StockData = () => {
       setFilteredData(filtered.slice(0, itemsPerPage));
       setTotalCount(filtered.length);
     }
-  };
-
-  // 초기화 기능
-  const handleReset = () => {
-    setSearchTerm("");
-    setCurrentPage(1);
-    const { data, total } = STOCK_DATA_API.getStockData(1, itemsPerPage);
-    setFilteredData(data);
-    setTotalCount(total);
   };
 
   // 페이지네이션
@@ -77,8 +65,6 @@ const StockData = () => {
 
   // 페이지네이션 계산
   const totalPages = Math.ceil(totalCount / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage + 1;
-  const endIndex = Math.min(currentPage * itemsPerPage, totalCount);
 
   const handleStockClick = (stock: StockItem) => {
     // Next.js 라우터를 사용하여 페이지 이동
@@ -88,34 +74,22 @@ const StockData = () => {
   };
 
   return (
-    <div className="h-full bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col p-6 w-full">
-      {/* 헤더 */}
-      <div className="mb-2">
-        <div className="p-2">
-          <div className="flex items-center gap-3 mb-6">
-            <Search className="w-4 h-4 text-blue-500" />
-            <h1 className="text-xl font-bold text-gray-800">종목 검색</h1>
-          </div>
-
-          {/* 검색 바 */}
-          <div className="flex gap-3 mb-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <Input
-                placeholder="종목명 또는 종목코드를 입력하세요..."
-                value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="pl-10 h-12 border-gray-200 focus:border-blue-300 focus:ring-blue-100"
-              />
-            </div>
-          </div>
+    <div className="h-full w-full pt-10">
+      <div className="flex gap-3 w-full">
+        <div className="relative w-full">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+          <input
+            placeholder="종목명 또는 종목코드를 입력하세요..."
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="pl-10 h-12 rounded-full bg-[#304A63] border-none text-white focus:outline-none placeholder:text-gray-300 w-full"
+          />
         </div>
       </div>
 
       {/* 주식 리스트 */}
       <>
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">종목 목록</h2>
-        <div className="space-y-3">
+        <div className="space-y-0">
           {filteredData.map((stock) => (
             <StockDataItem
               key={stock.code}
@@ -127,7 +101,7 @@ const StockData = () => {
 
         {/* 페이지네이션 */}
         {totalPages > 1 && (
-          <div className="border-t border-gray-100 px-6 py-4 bg-gray-50 rounded-b-2xl">
+          <div className="border-t px-6 py-4">
             <div className="flex items-center justify-center">
               <nav className="flex items-center gap-2">
                 <Button
@@ -216,23 +190,23 @@ const StockDataItem = ({
 
   return (
     <div
-      className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-gray-50 to-white border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all duration-200 cursor-pointer group"
+      className="flex items-center justify-between p-4 bg-none cursor-pointer group border-b border-gray-700 hover:bg-[#19212A]"
       onClick={() => handleStockClick(stock)}
     >
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-          {stock.name.charAt(0)}
+        <div className="w-10 h-10 bg-gradient-to-br from-[#1578D8] to-[#0e5ba8] rounded-full flex items-center justify-center text-white font-bold text-sm">
+          {stock.name.slice(0, 2)}
         </div>
         <div>
-          <div className="font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
+          <div className="font-semibold text-white transition-colors">
             {stock.name}
           </div>
-          <div className="text-xs text-gray-500">{stock.code}</div>
+          <div className="text-xs text-gray-300">{stock.code}</div>
         </div>
       </div>
 
       <div
-        className="p-2 rounded-full hover:bg-red-50 transition-colors"
+        className="p-2 rounded-full transition-colors"
         onClick={(e) => {
           e.stopPropagation();
           handleFavorite(stock);
@@ -240,11 +214,11 @@ const StockDataItem = ({
       >
         {liked ? (
           <HeartIcon
-            fill="#ef4444"
-            className="w-5 h-5 cursor-pointer text-red-500"
+            fill="#4096ff"
+            className="w-5 h-5 cursor-pointer text-blue-400"
           />
         ) : (
-          <Heart className="w-5 h-5 cursor-pointer text-gray-400 hover:text-red-500 transition-colors" />
+          <Heart className="w-5 h-5 cursor-pointer text-gray-400 hover:text-blue-400 transition-colors" />
         )}
       </div>
     </div>
