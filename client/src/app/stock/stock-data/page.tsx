@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, HeartIcon, Search } from "lucide-react";
 import { WISHLIST_API } from "@/utils/api/wishlist.api";
 import { StockItem } from "@/types/stock";
+import { StockDataItem } from "@/components/stock/stock-data-item";
 
 const StockData = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,10 +21,8 @@ const StockData = () => {
     setCurrentPage(1); // 검색 시 첫 페이지로 이동
 
     if (term.trim() === "") {
-      // 검색어가 없으면 전체 데이터
-      const { data, total } = STOCK_DATA_API.getStockData(1, itemsPerPage);
-      setFilteredData(data);
-      setTotalCount(total);
+      setFilteredData([]);
+      setTotalCount(0);
     } else {
       // 검색어가 있으면 필터링
       const allData = STOCK_DATA_API.getStockData(1, 10000).data; // 전체 데이터 가져오기
@@ -56,14 +55,6 @@ const StockData = () => {
     }
   };
 
-  // 컴포넌트 마운트 시 초기 데이터 로드
-  useEffect(() => {
-    const { data, total } = STOCK_DATA_API.getStockData(1, itemsPerPage);
-    setFilteredData(data);
-    setTotalCount(total);
-  }, []);
-
-  // 페이지네이션 계산
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   const handleStockClick = (stock: StockItem) => {
@@ -73,8 +64,16 @@ const StockData = () => {
     }&name=${encodeURIComponent(stock.name)}`;
   };
 
+  const famousStock = [
+    { code: "005930", name: "삼성전자" },
+    { code: "000660", name: "SK하이닉스" },
+    { code: "005380", name: "현대차" },
+    { code: "000270", name: "기아" },
+  ];
+
   return (
     <div className="h-full w-full pt-10">
+      {/* 검색 바 */}
       <div className="flex gap-3 w-full">
         <div className="relative w-full">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -86,6 +85,24 @@ const StockData = () => {
           />
         </div>
       </div>
+
+      {filteredData.length === 0 && searchTerm.trim() !== "" && (
+        <div className="flex items-center justify-center h-full">
+          <p className="text-gray-400">검색 결과가 없습니다.</p>
+        </div>
+      )}
+      {filteredData.length === 0 && searchTerm.trim() === "" && (
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold text-white mb-4">인기 주식</h2>
+          {famousStock.map((stock) => (
+            <StockDataItem
+              key={stock.code}
+              stock={stock}
+              handleStockClick={handleStockClick}
+            />
+          ))}
+        </div>
+      )}
 
       {/* 주식 리스트 */}
       <>
@@ -158,69 +175,6 @@ const StockData = () => {
           </div>
         )}
       </>
-    </div>
-  );
-};
-
-const StockDataItem = ({
-  stock,
-  handleStockClick,
-}: {
-  stock: StockItem;
-  handleStockClick: (stock: StockItem) => void;
-}) => {
-  const [liked, setLiked] = useState(false);
-
-  useEffect(() => {
-    const wishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
-    const isFavorite = (code: string) => {
-      return wishlist.some((item: StockItem) => item.code === code) as boolean;
-    };
-    setLiked(isFavorite(stock.code));
-  }, [stock]);
-
-  const handleFavorite = (stock: StockItem) => {
-    if (liked) {
-      WISHLIST_API.removeWishlist({ code: stock.code, name: stock.name });
-    } else {
-      WISHLIST_API.addWishlist({ code: stock.code, name: stock.name });
-    }
-    setLiked(!liked);
-  };
-
-  return (
-    <div
-      className="flex items-center justify-between p-4 bg-none cursor-pointer group border-b border-gray-700 hover:bg-[#19212A]"
-      onClick={() => handleStockClick(stock)}
-    >
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-[#1578D8] to-[#0e5ba8] rounded-full flex items-center justify-center text-white font-bold text-sm">
-          {stock.name.slice(0, 2)}
-        </div>
-        <div>
-          <div className="font-semibold text-white transition-colors">
-            {stock.name}
-          </div>
-          <div className="text-xs text-gray-300">{stock.code}</div>
-        </div>
-      </div>
-
-      <div
-        className="p-2 rounded-full transition-colors"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleFavorite(stock);
-        }}
-      >
-        {liked ? (
-          <HeartIcon
-            fill="#4096ff"
-            className="w-5 h-5 cursor-pointer text-blue-400"
-          />
-        ) : (
-          <Heart className="w-5 h-5 cursor-pointer text-gray-400 hover:text-blue-400 transition-colors" />
-        )}
-      </div>
     </div>
   );
 };

@@ -22,21 +22,28 @@ const Main = () => {
   return (
     <div className="h-full flex flex-col relative">
       {/* 헤더 섹션 */}
-      <div className="flex justify-start py-6">
-        <h1 className="text-xl font-bold text-white mb-2">
+      <div className="flex justify-between pt-10 pb-6 px-6">
+        <div className="text-xl font-bold text-white">
           허들러 주식 투자 에이전트
-        </h1>
+        </div>
+        <Button
+          variant="ghost"
+          onClick={handleLogin}
+          className="text-gray-500 hover:bg-gray-800/10"
+        >
+          로그인
+        </Button>
       </div>
 
-      <div className="flex justify-around w-full">
+      <div className="flex justify-between w-full px-6 gap-4">
         <MainItem onClick={() => router.push("/stock/stock-data")} />
         <MainItem2 onClick={() => router.push("/stock/watchlist")} />
       </div>
-      <div className="w-full px-6 mt-10">
+      <div className="w-full px-6 mt-4">
         <MainItem3 />
       </div>
 
-      <div className="w-full px-6 mt-10">
+      <div className="w-full px-6 mt-4">
         <HoldingList />
       </div>
 
