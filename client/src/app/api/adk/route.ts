@@ -7,17 +7,24 @@ export async function POST(request: NextRequest) {
     const requestBody = {
       user_id: "stock_user",
       message: message,
-    } as { user_id: string; message: string; session_id?: string };
+    } as {
+      user_id: string;
+      message: string;
+      session_id?: string;
+      instruction?: string;
+    };
 
     if (session_id) {
       requestBody.session_id = session_id;
     }
-    console.log(requestBody);
+
+    const kiwoomToken = request.cookies.get("token")?.value;
 
     const response = await fetch(`http://localhost:8000/api/v1/adk/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        KIWOOM_TOKEN: kiwoomToken || "",
       },
       body: JSON.stringify(requestBody),
     });

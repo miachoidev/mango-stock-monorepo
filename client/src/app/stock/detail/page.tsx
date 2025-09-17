@@ -17,8 +17,6 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
-  ArrowLeft,
-  SquareChevronRight,
   ChevronRight,
   Rocket,
   Brain,
@@ -26,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import useChat from "@/hooks/use-chat";
 import { useRouter, useSearchParams } from "next/navigation";
+import { STOCK_TEMPLATE } from "@/utils/template";
 
 const StockDetail = () => {
   const router = useRouter();
@@ -115,23 +114,12 @@ const StockDetail = () => {
   const { streamResponse } = useChat();
 
   const onClickAnalyzeStock = () => {
-    const newMessage = `
-      ${name} 주식에 대해 분석해줘
-    `;
+    const newMessage = STOCK_TEMPLATE.aiTemplate(name, code);
     streamResponse(newMessage);
   };
 
   const onClickInvestAdvice = () => {
-    const newMessage = `
-      ${name} 주식에 대해 투자 조언해줘
-    `;
-    streamResponse(newMessage);
-  };
-
-  const onClickIntroduceStock = () => {
-    const newMessage = `
-      ${name} 주식에 대해 소개해줘
-    `;
+    const newMessage = STOCK_TEMPLATE.investAdviceTemplate(name, code);
     streamResponse(newMessage);
   };
 
@@ -291,7 +279,7 @@ const StockDetail = () => {
         <div
           className="w-full mt-4 bg-gradient-to-r from-[#1C306D] to-[#1C63A9] hover:from-[#1C306D]/80 hover:to-[#1C63A9]/80 h-16 rounded-[24px] p-4 flex items-center justify-between cursor-pointer"
           onClick={() => {
-            onClickAnalyzeStock();
+            onClickInvestAdvice();
           }}
         >
           <div className="flex items-center justify-center gap-5">

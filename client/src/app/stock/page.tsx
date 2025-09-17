@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { LucideRocket, Search, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import HoldingList from "@/components/page/holding/holding-list";
+import useChat from "@/hooks/use-chat";
+import { STOCK_TEMPLATE } from "@/utils/template";
 
 const Main = () => {
   const router = useRouter();
@@ -68,29 +70,38 @@ const MainItem = ({ onClick }: { onClick: () => void }) => {
           </div>
         </div>
         <div className="text-xs text-gray-400 mt-7">주식 검색</div>
-        <div className="text-md text-white mt-1">인기 주식 & 인기 채권</div>
+        <div className="text-md text-white mt-1 font-semibold">
+          인기 주식 & 인기 채권
+        </div>
       </div>
     </div>
   );
 };
 const MainItem2 = ({ onClick }: { onClick: () => void }) => {
   return (
-    <div className="main-item-card" onClick={onClick}>
-      <div className="main-item-card-inner">
+    <div className="main-item-card yellow" onClick={onClick}>
+      <div className="main-item-card-inner yellow">
         <div className="flex items-center justify-between h-8">
           <div className="text-xl font-semibold">관심 목록</div>
-          <div className="bg-[#35363D] rounded-full w-7 h-7 flex items-center justify-center">
-            <Star className="w-3 h-3 text-white" />
+          <div className="bg-[#ffeab2] rounded-full w-7 h-7 flex items-center justify-center">
+            <Star className="w-3 h-3 text-black" />
           </div>
         </div>
-        <div className="text-xs text-gray-400 mt-7">주식 골라보기</div>
-        <div className="text-md text-white mt-1">관심 목록 관리</div>
+        <div className="text-xs text-gray-700 mt-7">주식 골라보기</div>
+        <div className="text-md text-black mt-1 font-semibold">
+          관심 목록 관리
+        </div>
       </div>
     </div>
   );
 };
 
 const MainItem3 = () => {
+  const { streamResponse } = useChat();
+  const onClickRecommend = () => {
+    const newMessage = STOCK_TEMPLATE.recommendTemplate();
+    streamResponse(newMessage);
+  };
   return (
     <div className="w-full bg-[#19212A] rounded-2xl p-6 text-white">
       <div className="flex items-center justify-between h-10">
@@ -101,7 +112,10 @@ const MainItem3 = () => {
       </div>
       <div className="text-sm text-gray-400 mt-6">AI Agent 추천 종목</div>
 
-      <Button className="w-full mt-4 bg-gradient-to-r from-[#fdbe02] to-[#d14808] rounded-full hover:bg-gradient-to-r hover:from-[#fdbe02]/80 hover:to-[#d14808]/80">
+      <Button
+        className="w-full mt-4 bg-gradient-to-r from-[#fdbe02] to-[#d14808] rounded-full hover:bg-gradient-to-r hover:from-[#fdbe02]/80 hover:to-[#d14808]/80"
+        onClick={onClickRecommend}
+      >
         추천 받기
       </Button>
     </div>

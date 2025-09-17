@@ -56,7 +56,7 @@ export default function ChatLayout({
               />
             )}
           </div>
-          <div className="stock-container-inner h-full w-full px-[10%] min-w-[600px] overflow-y-auto pt-10">
+          <div className="stock-container-inner h-full w-full px-[10%] min-w-[600px] overflow-y-auto overflow-x-hidden pt-10">
             {children}
           </div>
         </div>

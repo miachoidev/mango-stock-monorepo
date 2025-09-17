@@ -17,12 +17,7 @@ import { PromptLoader } from "@/components/ui/custom/prompt/loader";
 import { PromptScrollButton } from "@/components/ui/custom/prompt/scroll-button";
 import useChat from "@/hooks/use-chat";
 import Mango from "@/components/chat/mango";
-
-const chatSuggestions = [
-  "주식 시장 현황이 어때?",
-  "삼성전자 주가 분석해줘",
-  "최근 주식 투자 트렌드는?",
-];
+import { STOCK_TEMPLATE } from "@/utils/template";
 
 export default function AppRender({
   sessionId: initialSessionId,
@@ -39,6 +34,29 @@ export default function AppRender({
     console.log(messages);
   }, [messages]);
 
+  const chatSuggestions = [
+    { id: 1, label: "주식 시장 현황이 어때?", value: "주식 시장 현황이 어때?" },
+    { id: 2, label: "삼성전자 주가 분석해줘", value: "005930" },
+    {
+      id: 3,
+      label: "최근 주식 투자 트렌드는?",
+      value: "최근 주식 투자 트렌드는?",
+    },
+  ];
+
+  const onClickChatSuggestion = (suggestion: {
+    id: number;
+    label: string;
+    value: string;
+  }) => {
+    if (suggestion.id === 1) {
+      streamResponse(suggestion.value);
+    } else if (suggestion.id === 2) {
+      streamResponse(STOCK_TEMPLATE.aiTemplate("삼성전자", suggestion.value));
+    } else if (suggestion.id === 3) {
+      streamResponse(suggestion.value);
+    }
+  };
   return (
     <div className="flex h-full w-full flex-col items-center justify-center space-y-4 p-4 mx-auto max-w-screen-lg">
       <ChatContainer
@@ -56,7 +74,7 @@ export default function AppRender({
                 망고 스톡
               </div>
             </div>
-            <div className="mt-10">
+            <div className="mt-10 w-full h-full justify-center items-center flex overflow-x-hidden overflow-y-hidden">
               <Mango />
             </div>
           </div>
@@ -77,12 +95,12 @@ export default function AppRender({
               >
                 {isAssistant ? (
                   <div className="text-foreground prose rounded-lg px-3 py-2">
-                    <Markdown className={"space-y-4 text-white"}>
-                      {message.content + message.content + message.content}
+                    <Markdown className={"space-y-4 text-white text-sm"}>
+                      {message.content}
                     </Markdown>
                   </div>
                 ) : (
-                  <MessageContent className="bg-[#fdbe02] text-black inline-flex text-start rounded-3xl">
+                  <MessageContent className="bg-[#fdbe02] text-black inline-flex text-start rounded-xl text-sm">
                     {message.content}
                   </MessageContent>
                 )}
@@ -93,7 +111,7 @@ export default function AppRender({
 
         {isStreaming && (
           <div className="ps-2">
-            <PromptLoader variant="pulse-dot" />
+            <PromptLoader variant="pulse-dot" className="bg-white" />
           </div>
         )}
       </ChatContainer>
@@ -109,7 +127,10 @@ export default function AppRender({
       <Input
         value={prompt}
         onValueChange={setPrompt}
-        onSubmit={() => streamResponse(prompt)}
+        onSubmit={() => {
+          streamResponse(prompt);
+          setPrompt("");
+        }}
         className="w-full max-w-(--breakpoint-md) bg-[#1E2636] text-white border-blue-100"
         style={{
           boxShadow:
@@ -126,7 +147,10 @@ export default function AppRender({
               variant="default"
               size="icon"
               className="h-8 w-8 rounded-full bg-[#ff9807] hover:bg-[#ff9807]/80"
-              onClick={() => streamResponse(prompt)}
+              onClick={() => {
+                streamResponse(prompt);
+                setPrompt("");
+              }}
             >
               {isStreaming ? (
                 <SquareIcon className="text-black" />
@@ -140,17 +164,19 @@ export default function AppRender({
 
       {/*Chat suggestions*/}
       {!messages.length && (
-        <div className="flex flex-wrap gap-4">
-          {chatSuggestions.map((suggestion: string, key: number) => (
+        <section className="flex flex-wrap gap-4">
+          {chatSuggestions.map((suggestion) => (
             <div
-              key={key}
-              onClick={() => setPrompt(suggestion)}
+              key={suggestion.id}
+              onClick={() => {
+                onClickChatSuggestion(suggestion);
+              }}
               className="bg-[#ff9807] px-4 py-2 rounded-full text-xs font-medium text-white cursor-pointer hover:bg-[#ff9807]/80"
             >
-              {suggestion}
+              {suggestion.label}
             </div>
           ))}
-        </div>
+        </section>
       )}
     </div>
   );

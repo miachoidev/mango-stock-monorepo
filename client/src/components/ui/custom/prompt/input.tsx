@@ -123,6 +123,8 @@ function PromptInputTextarea({
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       onSubmit?.();
+      // Submit 후 input 값 초기화
+      setValue("");
     }
     onKeyDown?.(e);
   };

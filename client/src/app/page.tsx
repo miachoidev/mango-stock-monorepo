@@ -10,7 +10,7 @@ export default function Home() {
     const token = await kiwoomLogin();
     if (token) {
       Cookies.set("token", token);
-      router.push("/chat");
+      router.push("/stock");
     }
   };
   return (
