@@ -72,7 +72,7 @@ const StockData = () => {
   ];
 
   return (
-    <div className="h-full w-full pt-10">
+    <div className="h-full w-full">
       {/* 검색 바 */}
       <div className="flex gap-3 w-full">
         <div className="relative w-full">

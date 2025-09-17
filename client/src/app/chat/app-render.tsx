@@ -17,12 +17,13 @@ import { cn } from "@/lib/utils";
 import { PromptLoader } from "@/components/ui/custom/prompt/loader";
 import { PromptScrollButton } from "@/components/ui/custom/prompt/scroll-button";
 import useChat from "@/hooks/use-chat";
+import Banana from "@/components/chat/mango";
+import Mango from "@/components/chat/mango";
 
 const chatSuggestions = [
   "주식 시장 현황이 어때?",
   "삼성전자 주가 분석해줘",
   "최근 주식 투자 트렌드는?",
-  "포트폴리오 관리 방법을 알려줘",
 ];
 
 export default function AppRender({
@@ -47,12 +48,27 @@ export default function AppRender({
   }, [messages]);
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center space-y-4 p-4 mx-auto max-w-screen-lg border-x-2 border-gray-500">
+    <div className="flex h-full w-full flex-col items-center justify-center space-y-4 p-4 mx-auto max-w-screen-lg">
       <ChatContainer
-        className={cn("relative w-full flex-1 space-y-4 py-10 bg-gray-50")}
+        className={cn("relative w-full flex-1 space-y-4 py-10")}
         ref={containerRef}
         scrollToRef={bottomRef}
       >
+        {messages.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full">
+            <div className="flex flex-col items-center justify-center">
+              <div className="text-lg font-medium text-gray-400">
+                AI Agent 주식 투자 에이전트
+              </div>
+              <div className="text-3xl mt-2 font-bold text-white">
+                망고 스톡
+              </div>
+            </div>
+            <div className="mt-10">
+              <Mango />
+            </div>
+          </div>
+        )}
         {messages.map((message) => {
           const isAssistant = message.role === "assistant";
           return (
@@ -106,14 +122,14 @@ export default function AppRender({
       >
         <PromptInputTextarea placeholder="주식에 대해 무엇이든 물어보세요..." />
 
-        <PromptInputActions className="flex items-center justify-between gap-2 pt-2">
+        <PromptInputActions className="flex items-center justify-end gap-2 pt-2">
           <PromptInputAction
             tooltip={isStreaming ? "Stop generation" : "Send message"}
           >
             <Button
               variant="default"
               size="icon"
-              className="h-8 w-8 rounded-full"
+              className="h-8 w-8 rounded-full bg-[#313fd3]"
               onClick={() => streamResponse(prompt)}
             >
               {isStreaming ? <SquareIcon /> : <ArrowUpIcon />}
@@ -124,11 +140,15 @@ export default function AppRender({
 
       {/*Chat suggestions*/}
       {!isFirstResponse && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-4">
           {chatSuggestions.map((suggestion: string, key: number) => (
-            <Suggestion key={key} onClick={() => setPrompt(suggestion)}>
+            <div
+              key={key}
+              onClick={() => setPrompt(suggestion)}
+              className="bg-[#313fd3] px-4 py-2 rounded-full text-xs font-medium text-white cursor-pointer hover:bg-[#313fd3]/80"
+            >
               {suggestion}
-            </Suggestion>
+            </div>
           ))}
         </div>
       )}

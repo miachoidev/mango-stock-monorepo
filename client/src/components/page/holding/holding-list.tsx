@@ -98,9 +98,7 @@ const HoldingList = () => {
 
   const handleStockClick = (stock: HoldingStock) => {
     router.push(
-      `/stock/stock-detail?code=${stock.code}&name=${encodeURIComponent(
-        stock.name
-      )}`
+      `/stock/detail?code=${stock.code}&name=${encodeURIComponent(stock.name)}`
     );
   };
 

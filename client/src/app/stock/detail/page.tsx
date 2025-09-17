@@ -137,7 +137,7 @@ const StockDetail = () => {
 
   if (isLoading) {
     return (
-      <div className="h-full bg-white flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <div className="text-lg">차트 데이터를 불러오는 중...</div>
       </div>
     );
@@ -145,7 +145,7 @@ const StockDetail = () => {
 
   if (error) {
     return (
-      <div className="h-full bg-white flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <div className="text-lg text-red-500">
           차트 데이터를 불러올 수 없습니다.
         </div>
@@ -155,62 +155,48 @@ const StockDetail = () => {
 
   if (!data || data.length === 0) {
     return (
-      <div className="h-full bg-white flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <div className="text-lg text-gray-500">차트 데이터가 없습니다.</div>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col p-6 w-full">
+    <div className="h-full flex flex-col w-full">
       {/* 헤더 */}
-      <div className="mb-8">
-        <div className="flex items-center gap-4 mb-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => router.back()}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            뒤로
-          </Button>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="text-xl font-bold text-gray-800">{name}</div>
-            <span className="bg-gray-100 px-2 py-1 rounded-md text-xs text-gray-600 font-medium">
-              {code}
-            </span>
+      <section>
+        <div>
+          <div className="flex items-center gap-2">
+            <div className="text-xl font-bold text-white">{name}</div>
+            <span className="text-xs text-gray-300">{code}</span>
           </div>
 
           {/* 현재 가격 정보 */}
           {currentPriceInfo && (
-            <div className="space-y-4 flex flex-col items-start justify-center">
-              <div className="text-xl font-bold text-gray-900">
+            <div className="flex flex-col items-start justify-center mt-2">
+              <div className="text-3xl font-bold text-white">
                 {currentPriceInfo.currentPrice.toLocaleString()}원
               </div>
               <div
-                className={`flex items-center gap-2 rounded-md ${
+                className={`flex items-center gap-2 mt-1 ${
                   currentPriceInfo.isUp
-                    ? "text-red-600"
+                    ? "text-red-500"
                     : currentPriceInfo.isDown
-                    ? "text-blue-600"
-                    : "text-gray-600"
+                    ? "text-blue-500"
+                    : "text-gray-500"
                 }`}
               >
-                {currentPriceInfo.isUp && <TrendingUp className="w-6 h-6" />}
+                {currentPriceInfo.isUp && <TrendingUp className="w-5 h-5" />}
                 {currentPriceInfo.isDown && (
-                  <TrendingDown className="w-6 h-6" />
+                  <TrendingDown className="w-5 h-5" />
                 )}
-                {currentPriceInfo.isFlat && <Minus className="w-6 h-6" />}
+                {currentPriceInfo.isFlat && <Minus className="w-5 h-5" />}
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-bold flex items-center gap-1">
+                  <span className="text-sm font-medium flex items-center gap-1">
                     {currentPriceInfo.change >= 0 ? "+" : ""}
                     {currentPriceInfo.change.toLocaleString()}원
                   </span>
-                  <span className="text-sm font-semibold">
+                  <span className="text-sm font-medium">
                     ({currentPriceInfo.changePercent >= 0 ? "+" : ""}
                     {currentPriceInfo.changePercent.toFixed(2)}%)
                   </span>
@@ -219,28 +205,12 @@ const StockDetail = () => {
             </div>
           )}
         </div>
-      </div>
-
-      {/* 차트 컨테이너 */}
-      <div className="w-full flex gap-4">
-        <Button
-          className="flex-1 bg-red-500"
-          onClick={() => handleTrade("buy")}
-        >
-          매수
-        </Button>
-        <Button
-          className="flex-1 bg-blue-500"
-          onClick={() => handleTrade("sell")}
-        >
-          매도
-        </Button>
-      </div>
+      </section>
 
       <div className="w-full">
         {/* 가격 차트 */}
         <div className="w-full min-h-0">
-          <div className="h-[450px] w-full mt-5">
+          <div className="h-[400px] w-full mt-5">
             <ResponsiveContainer>
               <LineChart
                 data={chartData}
@@ -252,7 +222,7 @@ const StockDetail = () => {
                   tick={{ fontSize: 12 }}
                   angle={-45}
                   textAnchor="end"
-                  height={200}
+                  height={140}
                   type="category"
                 />
                 <YAxis
@@ -286,6 +256,22 @@ const StockDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* 차트 컨테이너 */}
+      <section className="w-full flex gap-4">
+        <Button
+          className="flex-1 bg-red-500"
+          onClick={() => handleTrade("buy")}
+        >
+          매수
+        </Button>
+        <Button
+          className="flex-1 bg-blue-500"
+          onClick={() => handleTrade("sell")}
+        >
+          매도
+        </Button>
+      </section>
 
       <div className="w-full">
         <Button

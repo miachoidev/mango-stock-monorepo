@@ -18,7 +18,7 @@ export default function ChatLayout({
   return (
     <div
       className={cn(
-        "rounded-md flex flex-col md:flex-row bg-[#fff] w-full mx-auto border border-neutral-200",
+        "rounded-md flex flex-col md:flex-row bg-[#141A26] w-full mx-auto border border-neutral-200",
         "h-screen"
       )}
     >
@@ -56,7 +56,7 @@ export default function ChatLayout({
               />
             )}
           </div>
-          <div className="stock-container-inner h-full w-full px-[10%] min-w-[600px] overflow-y-auto">
+          <div className="stock-container-inner h-full w-full px-[10%] min-w-[600px] overflow-y-auto pt-10">
             {children}
           </div>
         </div>

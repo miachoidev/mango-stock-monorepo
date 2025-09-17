@@ -13,9 +13,7 @@ const Watchlist = () => {
 
   const handleStockClick = (stock: { code: string; name: string }) => {
     router.push(
-      `/stock/stock-detail?code=${stock.code}&name=${encodeURIComponent(
-        stock.name
-      )}`
+      `/stock/detail?code=${stock.code}&name=${encodeURIComponent(stock.name)}`
     );
   };
 
@@ -51,7 +49,7 @@ const Watchlist = () => {
   }
 
   return (
-    <div className="h-full flex flex-col mt-6">
+    <div className="h-full flex flex-col">
       <div className="mb-4">
         <div className="text-xl font-semibold text-white">관심 종목</div>
       </div>
