@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/custom/prompt/input";
 import { Button } from "@/components/ui/button";
 import { ArrowUpIcon, SquareIcon } from "lucide-react";
-import { Suggestion } from "@/components/ui/custom/prompt/suggestion";
 import { ChatContainer } from "@/components/ui/custom/prompt/chat-container";
 import { Message, MessageContent } from "@/components/ui/custom/prompt/message";
 import { Markdown } from "@/components/ui/custom/prompt/markdown";
@@ -17,7 +16,6 @@ import { cn } from "@/lib/utils";
 import { PromptLoader } from "@/components/ui/custom/prompt/loader";
 import { PromptScrollButton } from "@/components/ui/custom/prompt/scroll-button";
 import useChat from "@/hooks/use-chat";
-import Banana from "@/components/chat/mango";
 import Mango from "@/components/chat/mango";
 
 const chatSuggestions = [

@@ -9,7 +9,14 @@ import {
 } from "@/utils/api/kiwoom-trading.api";
 import { KIOOM_API } from "@/utils/api/kiwoom.api";
 import { useQuery } from "@tanstack/react-query";
-import { DollarSign, ShoppingCart, TrendingUp, ArrowLeft } from "lucide-react";
+import {
+  DollarSign,
+  ShoppingCart,
+  TrendingUp,
+  ArrowLeft,
+  TrendingDown,
+  Minus,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -168,7 +175,7 @@ export default function StockTrade() {
 
   if (isLoading) {
     return (
-      <div className="h-full bg-white flex items-center justify-center">
+      <div className="h-full flex items-center justify-center">
         <div className="text-lg">차트 데이터를 불러오는 중...</div>
       </div>
     );
@@ -196,39 +203,60 @@ export default function StockTrade() {
     <div className="h-full flex flex-col p-6">
       {/* 헤더 */}
       <div className="mb-6">
-        <div className="flex items-center gap-4 mb-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => router.back()}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            뒤로
-          </Button>
-        </div>
+        <section className="bg-[#19212A] rounded-xl p-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="text-xl font-bold text-white">{name}</div>
+              <span className="text-xs text-gray-300">{code}</span>
+            </div>
 
-        <div className="bg-white rounded-xl p-4 shadow-sm border">
-          <div className="flex items-center gap-3 mb-2">
-            <DollarSign className="w-6 h-6 text-green-500" />
-            <h3 className="text-xl font-bold text-gray-800">매매 주문</h3>
+            {/* 현재 가격 정보 */}
+            {currentPriceInfo && (
+              <div className="flex items-center mt-1 gap-4">
+                <div className="text-lg font-bold text-white">
+                  {currentPriceInfo.currentPrice.toLocaleString()}원
+                </div>
+                <div
+                  className={`flex items-center gap-1 ${
+                    currentPriceInfo.isUp
+                      ? "text-red-500"
+                      : currentPriceInfo.isDown
+                      ? "text-blue-500"
+                      : "text-gray-500"
+                  }`}
+                >
+                  {currentPriceInfo.isUp && <TrendingUp className="w-5 h-5" />}
+                  {currentPriceInfo.isDown && (
+                    <TrendingDown className="w-5 h-5" />
+                  )}
+                  {currentPriceInfo.isFlat && <Minus className="w-5 h-5" />}
+                  <div className="flex items-center gap-1">
+                    <span className="text-xs font-medium flex items-center gap-1">
+                      {currentPriceInfo.change >= 0 ? "+" : ""}
+                      {currentPriceInfo.change.toLocaleString()}원
+                    </span>
+                    <span className="text-xs font-medium">
+                      ({currentPriceInfo.changePercent >= 0 ? "+" : ""}
+                      {currentPriceInfo.changePercent.toFixed(2)}%)
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="text-sm text-gray-600">
-            {name} ({code})
-          </div>
-        </div>
+        </section>
       </div>
 
-      <div className="mt-6 rounded-2xl shadow-lg border border-gray-100">
+      <div className="mt-6 rounded-2xl bg-[#19212A]">
         <div className="p-6">
           {/* 매수/매도 탭 */}
-          <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
+          <div className="flex bg-gray-700 rounded-xl p-1 mb-6">
             <button
               onClick={() => setTradeType("buy")}
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold transition-all duration-200 ${
                 tradeType === "buy"
                   ? "bg-red-500 text-white shadow-lg"
-                  : "text-gray-600 hover:bg-gray-200"
+                  : "text-gray-100 hover:bg-gray-600"
               }`}
             >
               <ShoppingCart className="w-4 h-4" />
@@ -239,7 +267,7 @@ export default function StockTrade() {
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-semibold transition-all duration-200 ${
                 tradeType === "sell"
                   ? "bg-blue-500 text-white shadow-lg"
-                  : "text-gray-600 hover:bg-gray-200"
+                  : "text-gray-100 hover:bg-gray-600"
               }`}
             >
               <TrendingUp className="w-4 h-4" />
@@ -249,26 +277,26 @@ export default function StockTrade() {
 
           {/* 주문 유형 선택 */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-100 mb-2">
               주문 유형
             </label>
             <div className="flex gap-3">
               <button
                 onClick={() => setPriceType("market")}
-                className={`px-4 py-2 rounded-lg border font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   priceType === "market"
-                    ? "bg-blue-50 border-blue-300 text-blue-700"
-                    : "border-gray-300 text-gray-600 hover:bg-gray-50"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-700 text-gray-100 hover:bg-gray-500"
                 }`}
               >
                 시장가
               </button>
               <button
                 onClick={() => setPriceType("limit")}
-                className={`px-4 py-2 rounded-lg border font-medium transition-colors ${
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   priceType === "limit"
-                    ? "bg-blue-50 border-blue-300 text-blue-700"
-                    : "border-gray-300 text-gray-600 hover:bg-gray-50"
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-700 text-gray-100 hover:bg-gray-500"
                 }`}
               >
                 지정가
@@ -279,7 +307,7 @@ export default function StockTrade() {
           {/* 입력 필드들 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-100 mb-2">
                 수량 (주)
               </label>
               <Input
@@ -287,14 +315,14 @@ export default function StockTrade() {
                 value={quantity}
                 onChange={(e) => setQuantity(Number(e.target.value))}
                 min="1"
-                className="text-center font-semibold"
+                className="text-center font-semibold bg-gray-700 border-none text-white w-20"
                 placeholder="수량을 입력하세요"
               />
             </div>
 
             {priceType === "limit" && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-100 mb-2">
                   가격 (원)
                 </label>
                 <Input
@@ -302,7 +330,7 @@ export default function StockTrade() {
                   value={price}
                   onChange={(e) => setPrice(Number(e.target.value))}
                   min="1"
-                  className="text-center font-semibold"
+                  className="text-center font-semibold bg-gray-700 border-none text-white w-50"
                   placeholder="가격을 입력하세요"
                 />
               </div>
@@ -343,13 +371,14 @@ export default function StockTrade() {
           </Button>
 
           {/* 주의사항 */}
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-xs text-blue-800">
-              🔒 키움증권 OpenAPI를 통한 실제 거래 시스템입니다. 주문 전 신중히
-              확인해주세요.
-            </p>
-          </div>
         </div>
+      </div>
+
+      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-xs text-blue-800">
+          키움증권 OpenAPI를 통한 실제 거래 시스템입니다. 주문 전 신중히
+          확인해주세요.
+        </p>
       </div>
     </div>
   );
