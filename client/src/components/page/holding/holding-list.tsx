@@ -237,7 +237,7 @@ const HoldingItem = ({ stock, onClick }: HoldingItemProps) => {
           {formatNumber(stock.totalValue)}
         </div>
         <div
-          className={`text-xs text-white ${
+          className={`text-xs ${
             stock.profitLoss >= 0 ? "text-red-400" : "text-blue-400"
           }`}
         >

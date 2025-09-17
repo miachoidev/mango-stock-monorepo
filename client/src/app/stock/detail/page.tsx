@@ -13,7 +13,16 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { TrendingUp, TrendingDown, Minus, ArrowLeft } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  Minus,
+  ArrowLeft,
+  SquareChevronRight,
+  ChevronRight,
+  Rocket,
+  Brain,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import useChat from "@/hooks/use-chat";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -257,48 +266,63 @@ const StockDetail = () => {
         </div>
       </div>
 
+      <section className="w-full">
+        <div
+          className="w-full mt-4 bg-gradient-to-r from-[#ffcd48] to-[#ff9d24] hover:from-[#ffcd48]/80 hover:to-[#ff9d24]/80 h-16 rounded-[24px] p-4 flex items-center justify-between cursor-pointer"
+          onClick={() => {
+            onClickAnalyzeStock();
+          }}
+        >
+          <div className="flex items-center justify-center gap-5">
+            <div className="flex items-center justify-center p-2 rounded-full bg-[#ffeab2]">
+              <Rocket className="w-4 h-4 text-black" />
+            </div>
+            <div className="flex flex-col items-start justify-center">
+              <div className="text-black text-md font-semibold">AI 분석</div>
+              <div className="text-gray-700 text-xs">
+                망고 스탁 주식 투자 에이전트 분석
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center justify-center bg-[#ffeab2] p-2 rounded-full">
+            <ChevronRight className="w-4 h-4 text-black" />
+          </div>
+        </div>
+        <div
+          className="w-full mt-4 bg-gradient-to-r from-[#1C306D] to-[#1C63A9] hover:from-[#1C306D]/80 hover:to-[#1C63A9]/80 h-16 rounded-[24px] p-4 flex items-center justify-between cursor-pointer"
+          onClick={() => {
+            onClickAnalyzeStock();
+          }}
+        >
+          <div className="flex items-center justify-center gap-5">
+            <div className="flex items-center justify-center p-2 rounded-full bg-[#457AB6]">
+              <Brain className="w-4 h-4 text-white" />
+            </div>
+            <div className="flex flex-col items-start justify-center">
+              <div className="text-white text-md font-semibold">투자 조언</div>
+            </div>
+          </div>
+          <div className="flex items-center justify-center bg-[#457AB6] p-2 rounded-full">
+            <ChevronRight className="w-4 h-4 text-white" />
+          </div>
+        </div>
+      </section>
+
       {/* 차트 컨테이너 */}
-      <section className="w-full flex gap-4">
+      <section className="w-full flex gap-4 mt-8">
         <Button
-          className="flex-1 bg-red-500"
+          className="flex-1 bg-red-500 h-12"
           onClick={() => handleTrade("buy")}
         >
           매수
         </Button>
         <Button
-          className="flex-1 bg-blue-500"
+          className="flex-1 bg-blue-500 h-12"
           onClick={() => handleTrade("sell")}
         >
           매도
         </Button>
       </section>
-
-      <div className="w-full">
-        <Button
-          className="w-full mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-          onClick={() => {
-            onClickAnalyzeStock();
-          }}
-        >
-          분석
-        </Button>
-        <Button
-          className="w-full mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-          onClick={() => {
-            onClickInvestAdvice();
-          }}
-        >
-          투자 조언
-        </Button>
-        <Button
-          className="w-full mt-4 bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
-          onClick={() => {
-            onClickIntroduceStock();
-          }}
-        >
-          종목 소개
-        </Button>
-      </div>
     </div>
   );
 };
