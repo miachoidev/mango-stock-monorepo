@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { ChevronLeft, Settings } from "lucide-react";
+import { ChevronLeft, LucideBanana, MapPinIcon, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import ChatMain from "@/components/chat/chat-main";
@@ -31,10 +31,10 @@ export default function ChatLayout({
         )}
       >
         <Button
-          className="absolute top-1/2 -translate-y-1/2 -left-10 cursor-pointer bg-blue-400 hover:bg-blue-500 rounded-l-lg rounded-r-none"
+          className="absolute top-1/2 -translate-y-1/2 -left-10 cursor-pointer bg-yellow-400 hover:bg-yellow-500 rounded-l-lg rounded-r-none"
           onClick={() => setStockOpen(!stockOpen)}
         >
-          <Settings className="text-white" />
+          <LucideBanana className="text-white" />
         </Button>
 
         <div

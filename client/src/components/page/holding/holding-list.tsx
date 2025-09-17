@@ -211,7 +211,7 @@ const HoldingItem = ({ stock, onClick }: HoldingItemProps) => {
       className="bg-[#19212A] rounded-xl p-4 hover:shadow-md cursor-pointer hover:scale-[1.01] flex items-center"
     >
       <div className="w-10 h-10 mr-5">
-        <div className="w-10 h-10 flex items-center justify-center text-sm font-semibold rounded-full text-white bg-gradient-to-r from-blue-500 to-[#0e5ba8]">
+        <div className="w-10 h-10 flex items-center justify-center text-sm font-semibold rounded-full text-white bg-gradient-to-r from-[#f6b36f] to-[#ff9807]">
           {stock.name.slice(0, 2)}
         </div>
       </div>

@@ -31,14 +31,8 @@ export default function AppRender({
 }: {
   sessionId?: string;
 }) {
-  const {
-    messages,
-    isStreaming,
-    setPrompt,
-    streamResponse,
-    isFirstResponse,
-    prompt,
-  } = useChat(initialSessionId);
+  const { messages, isStreaming, setPrompt, streamResponse, prompt } =
+    useChat(initialSessionId);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -79,18 +73,18 @@ export default function AppRender({
               }
             >
               <div
-                className={cn("max-w-[85%] flex-1 sm:max-w-[75%]", {
+                className={cn("max-w-[95%] flex-1", {
                   "justify-end text-end": !isAssistant,
                 })}
               >
                 {isAssistant ? (
-                  <div className="bg-muted text-foreground prose rounded-lg border px-3 py-2">
-                    <Markdown className={"space-y-4"}>
-                      {message.content}
+                  <div className="text-foreground prose rounded-lg px-3 py-2">
+                    <Markdown className={"space-y-4 text-white"}>
+                      {message.content + message.content + message.content}
                     </Markdown>
                   </div>
                 ) : (
-                  <MessageContent className="bg-primary text-primary-foreground inline-flex text-start">
+                  <MessageContent className="bg-[#fdbe02] text-black inline-flex text-start rounded-3xl">
                     {message.content}
                   </MessageContent>
                 )}
@@ -118,7 +112,11 @@ export default function AppRender({
         value={prompt}
         onValueChange={setPrompt}
         onSubmit={() => streamResponse(prompt)}
-        className="w-full max-w-(--breakpoint-md)"
+        className="w-full max-w-(--breakpoint-md) bg-[#1E2636] text-white border-blue-100"
+        style={{
+          boxShadow:
+            "0 0 3px #6df9fe75, 0 0 20px #75d6da86, 0 0 40px #57f9ff7a",
+        }}
       >
         <PromptInputTextarea placeholder="주식에 대해 무엇이든 물어보세요..." />
 
@@ -129,23 +127,27 @@ export default function AppRender({
             <Button
               variant="default"
               size="icon"
-              className="h-8 w-8 rounded-full bg-[#313fd3]"
+              className="h-8 w-8 rounded-full bg-[#ff9807] hover:bg-[#ff9807]/80"
               onClick={() => streamResponse(prompt)}
             >
-              {isStreaming ? <SquareIcon /> : <ArrowUpIcon />}
+              {isStreaming ? (
+                <SquareIcon className="text-black" />
+              ) : (
+                <ArrowUpIcon className="text-black" />
+              )}
             </Button>
           </PromptInputAction>
         </PromptInputActions>
       </Input>
 
       {/*Chat suggestions*/}
-      {!isFirstResponse && (
+      {!messages.length && (
         <div className="flex flex-wrap gap-4">
           {chatSuggestions.map((suggestion: string, key: number) => (
             <div
               key={key}
               onClick={() => setPrompt(suggestion)}
-              className="bg-[#313fd3] px-4 py-2 rounded-full text-xs font-medium text-white cursor-pointer hover:bg-[#313fd3]/80"
+              className="bg-[#ff9807] px-4 py-2 rounded-full text-xs font-medium text-white cursor-pointer hover:bg-[#ff9807]/80"
             >
               {suggestion}
             </div>

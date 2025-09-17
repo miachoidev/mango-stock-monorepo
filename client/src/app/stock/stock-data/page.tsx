@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { STOCK_DATA_API } from "@/utils/api/stock-data";
 import { Button } from "@/components/ui/button";
-import { Heart, HeartIcon, Search } from "lucide-react";
-import { WISHLIST_API } from "@/utils/api/wishlist.api";
+import { Search } from "lucide-react";
+
 import { StockItem } from "@/types/stock";
 import { StockDataItem } from "@/components/stock/stock-data-item";
+import { useRouter } from "next/navigation";
 
 const StockData = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,11 +58,12 @@ const StockData = () => {
 
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
+  const router = useRouter();
   const handleStockClick = (stock: StockItem) => {
     // Next.js 라우터를 사용하여 페이지 이동
-    window.location.href = `/stock/stock-detail?code=${
-      stock.code
-    }&name=${encodeURIComponent(stock.name)}`;
+    router.push(
+      `/stock/detail?code=${stock.code}&name=${encodeURIComponent(stock.name)}`
+    );
   };
 
   const famousStock = [

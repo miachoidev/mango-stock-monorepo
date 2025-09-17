@@ -23,9 +23,7 @@ const Main = () => {
     <div className="h-full flex flex-col relative">
       {/* 헤더 섹션 */}
       <div className="flex justify-between pb-6 px-6">
-        <div className="text-xl font-bold text-white">
-          허들러 주식 투자 에이전트
-        </div>
+        <div className="text-3xl font-bold text-[#ffcd48]">망고 스톡</div>
         <Button
           variant="ghost"
           onClick={handleLogin}
@@ -103,7 +101,7 @@ const MainItem3 = () => {
       </div>
       <div className="text-sm text-gray-400 mt-6">AI Agent 추천 종목</div>
 
-      <Button className="w-full mt-4 bg-gradient-to-r from-[#fa6eff] to-[#313fd3] rounded-full hover:bg-gradient-to-r hover:from-[#fa6eff]/80 hover:to-[#313fd3]/80">
+      <Button className="w-full mt-4 bg-gradient-to-r from-[#fdbe02] to-[#d14808] rounded-full hover:bg-gradient-to-r hover:from-[#fdbe02]/80 hover:to-[#d14808]/80">
         추천 받기
       </Button>
     </div>

@@ -27,23 +27,6 @@ export type MessageAvatarProps = {
   className?: string;
 };
 
-const MessageAvatar = ({
-  src,
-  alt,
-  fallback,
-  delayMs,
-  className,
-}: MessageAvatarProps) => {
-  return (
-    <Avatar className={cn("h-8 w-8 shrink-0", className)}>
-      <AvatarImage src={src} alt={alt} />
-      {fallback && (
-        <AvatarFallback delayMs={delayMs}>{fallback}</AvatarFallback>
-      )}
-    </Avatar>
-  );
-};
-
 export type MessageContentProps = {
   children: React.ReactNode;
   markdown?: boolean;
@@ -58,7 +41,7 @@ const MessageContent = ({
   ...props
 }: MessageContentProps) => {
   const classNames = cn(
-    "rounded-lg py-2 px-3 text-foreground bg-secondary prose break-words whitespace-normal",
+    "rounded-lg py-2 px-3 text-foreground prose break-words whitespace-normal",
     className
   );
 
@@ -117,10 +100,4 @@ const MessageAction = ({
   );
 };
 
-export {
-  Message,
-  MessageAvatar,
-  MessageContent,
-  MessageActions,
-  MessageAction,
-};
+export { Message, MessageContent, MessageActions, MessageAction };

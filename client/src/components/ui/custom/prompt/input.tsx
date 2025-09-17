@@ -50,6 +50,7 @@ type PromptInputProps = {
   onSubmit?: () => void;
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 };
 
 function Input({
@@ -60,6 +61,7 @@ function Input({
   onValueChange,
   onSubmit,
   children,
+  style,
 }: PromptInputProps) {
   const [internalValue, setInternalValue] = useState(value || "");
 
@@ -84,6 +86,7 @@ function Input({
             "border-input bg-background rounded-3xl border p-2 shadow-xs",
             className
           )}
+          style={style}
         >
           {children}
         </div>

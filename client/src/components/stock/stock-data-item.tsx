@@ -35,7 +35,7 @@ export const StockDataItem = ({
       onClick={() => handleStockClick(stock)}
     >
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-gradient-to-br from-[#1578D8] to-[#0e5ba8] rounded-full flex items-center justify-center text-white font-bold text-sm">
+        <div className="w-10 h-10 bg-gradient-to-br from-[#ffcf76] to-[#ff9807] rounded-full flex items-center justify-center text-white font-bold text-sm">
           {stock.name.slice(0, 2)}
         </div>
         <div>
@@ -55,11 +55,11 @@ export const StockDataItem = ({
       >
         {liked ? (
           <HeartIcon
-            fill="#4096ff"
-            className="w-5 h-5 cursor-pointer text-blue-400"
+            fill="#d14808"
+            className="w-5 h-5 cursor-pointer text-[#d14808]"
           />
         ) : (
-          <Heart className="w-5 h-5 cursor-pointer text-gray-400 hover:text-blue-400 transition-colors" />
+          <Heart className="w-5 h-5 cursor-pointer text-gray-400 hover:text-[#d14808] transition-colors" />
         )}
       </div>
     </div>
