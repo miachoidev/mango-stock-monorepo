@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { LucideRocket, Search, Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import HoldingList from "@/components/page/holding/holding-list";
-import useChat from "@/hooks/use-chat";
+import { useChat } from "@/hooks/use-chat";
 import { STOCK_TEMPLATE } from "@/utils/template";
 
 const Main = () => {
@@ -97,10 +97,10 @@ const MainItem2 = ({ onClick }: { onClick: () => void }) => {
 };
 
 const MainItem3 = () => {
-  const { streamResponse } = useChat();
+  const { onSubmit } = useChat();
   const onClickRecommend = () => {
     const newMessage = STOCK_TEMPLATE.recommendTemplate();
-    streamResponse(newMessage);
+    onSubmit(newMessage);
   };
   return (
     <div className="w-full bg-[#19212A] rounded-2xl p-6 text-white">

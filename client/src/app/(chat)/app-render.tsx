@@ -15,24 +15,20 @@ import { Markdown } from "@/components/ui/custom/prompt/markdown";
 import { cn } from "@/lib/utils";
 import { PromptLoader } from "@/components/ui/custom/prompt/loader";
 import { PromptScrollButton } from "@/components/ui/custom/prompt/scroll-button";
-import useChat from "@/hooks/use-chat";
 import Mango from "@/components/chat/mango";
 import { STOCK_TEMPLATE } from "@/utils/template";
+import { useChat } from "@/hooks/use-chat";
 
 export default function AppRender({
   sessionId: initialSessionId,
 }: {
   sessionId?: string;
 }) {
-  const { messages, isStreaming, setPrompt, streamResponse, prompt } =
+  const { messages, onSubmit, isStreaming, prompt, setPrompt } =
     useChat(initialSessionId);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    console.log(messages);
-  }, [messages]);
 
   const chatSuggestions = [
     { id: 1, label: "주식 시장 현황이 어때?", value: "주식 시장 현황이 어때?" },
@@ -50,11 +46,11 @@ export default function AppRender({
     value: string;
   }) => {
     if (suggestion.id === 1) {
-      streamResponse(suggestion.value);
+      onSubmit(suggestion.value);
     } else if (suggestion.id === 2) {
-      streamResponse(STOCK_TEMPLATE.aiTemplate("삼성전자", suggestion.value));
+      onSubmit(STOCK_TEMPLATE.aiTemplate("삼성전자", suggestion.value));
     } else if (suggestion.id === 3) {
-      streamResponse(suggestion.value);
+      onSubmit(suggestion.value);
     }
   };
   return (
@@ -96,12 +92,12 @@ export default function AppRender({
                 {isAssistant ? (
                   <div className="text-foreground prose rounded-lg px-3 py-2">
                     <Markdown className={"space-y-4 text-white text-sm"}>
-                      {message.content}
+                      {message.content || ""}
                     </Markdown>
                   </div>
                 ) : (
                   <MessageContent className="bg-[#fdbe02] text-black inline-flex text-start rounded-xl text-sm">
-                    {message.content}
+                    {message.content || ""}
                   </MessageContent>
                 )}
               </div>
@@ -128,7 +124,7 @@ export default function AppRender({
         value={prompt}
         onValueChange={setPrompt}
         onSubmit={() => {
-          streamResponse(prompt);
+          onSubmit(prompt);
           setPrompt("");
         }}
         className="w-full max-w-(--breakpoint-md) bg-[#1E2636] text-white border-blue-100"
@@ -148,7 +144,7 @@ export default function AppRender({
               size="icon"
               className="h-8 w-8 rounded-full bg-[#ff9807] hover:bg-[#ff9807]/80"
               onClick={() => {
-                streamResponse(prompt);
+                onSubmit(prompt);
                 setPrompt("");
               }}
             >

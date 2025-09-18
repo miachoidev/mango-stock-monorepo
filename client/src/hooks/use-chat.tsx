@@ -1,57 +1,23 @@
-import { extractMessageText, sendChatMessage } from "@/utils/api/adk.api";
-import { LocalMessage } from "@/types/chat-message";
-import { useEffect, useRef } from "react";
+import { useMessageStore } from "@/hooks/use-messages";
+import { SSEResponse } from "@/types/adk-session";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 
-import { create } from "zustand";
-
-interface ChatState {
-  messages: LocalMessage[];
-  isStreaming: boolean;
-  isFirstResponse: boolean;
-  prompt: string;
-  sessionId: string | undefined;
-  setSessionId: (sessionId: string | undefined) => void;
-  setIsStreaming: (isStreaming: boolean) => void;
-  setIsFirstResponse: (isFirstResponse: boolean) => void;
-  setPrompt: (prompt: string) => void;
-  setMessages: (
-    messages: LocalMessage[] | ((prev: LocalMessage[]) => LocalMessage[])
-  ) => void;
-}
-
-const useChatStore = create<ChatState>((set) => ({
-  messages: [],
-  setMessages: (messages) =>
-    set((state) => ({
-      messages:
-        typeof messages === "function" ? messages(state.messages) : messages,
-    })),
-  isStreaming: false,
-  isFirstResponse: false,
-  prompt: "",
-  sessionId: undefined,
-  setSessionId: (sessionId) => set({ sessionId }),
-  setIsStreaming: (isStreaming) => set({ isStreaming }),
-  setIsFirstResponse: (isFirstResponse) => set({ isFirstResponse }),
-  setPrompt: (prompt) => set({ prompt }),
-}));
-
-const useChat = (initialSessionId?: string) => {
-  const {
-    prompt,
-    setPrompt,
-    isFirstResponse,
-    setIsFirstResponse,
-    messages,
-    setMessages,
-    isStreaming,
-    setIsStreaming,
-    sessionId,
-    setSessionId,
-  } = useChatStore();
-  const streamContentRef = useRef("");
-
+export const useChat = (sessionId?: string | null) => {
   const streamIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [isNewChat, setIsNewChat] = useState(true);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [prompt, setPrompt] = useState("");
+  const scrollToBottomRef = useRef<(() => void) | null>(null);
+
+  const {
+    messages,
+    pushUserMessage,
+    pushToolMessage,
+    startStreamingMessage,
+    updateLastMessage,
+    clearStreamingMessage,
+  } = useMessageStore();
 
   useEffect(() => {
     return () => {
@@ -61,110 +27,166 @@ const useChat = (initialSessionId?: string) => {
     };
   }, []);
 
-  const stopStreaming = () => {
-    if (streamIntervalRef.current) {
-      clearInterval(streamIntervalRef.current);
-      streamIntervalRef.current = null;
-    }
-    setIsStreaming(false);
-  };
-
-  const streamResponse = async (message: string) => {
-    if (isStreaming) {
-      stopStreaming();
-      return;
-    }
+  // 🟢 채팅 전송
+  const onSubmit = async (message: string) => {
+    if (isStreaming) return;
 
     if (message.trim()) {
-      setIsFirstResponse(true);
+      setIsNewChat(false);
       setIsStreaming(true);
 
-      const newMessageId = messages.length + 1;
-      const userMessage = message.trim();
-
-      // 사용자 메시지 추가
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: newMessageId,
-          role: "user",
-          content: userMessage,
-        },
-      ]);
-
+      pushUserMessage(message);
       setPrompt("");
 
-      // 어시스턴트 메시지 플레이스홀더 추가
+      // 메시지 전송 후 스크롤을 하단으로 이동
+      setTimeout(() => {
+        scrollToBottomRef.current?.();
+      }, 100);
 
       try {
-        // 세션 ID가 있으면 포함해서 API 호출
-
-        const response = await sendChatMessage(userMessage, sessionId);
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: newMessageId + 1,
-            role: "assistant",
-            content: "",
+        // SSE 방식으로 스트리밍 요청
+        const response = await fetch("/api/adk/streaming", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        ]);
-        const responseText = extractMessageText(response);
+          body: JSON.stringify({
+            session_id: sessionId,
+            message,
+          }),
+        });
 
-        // 세션 ID가 응답에 포함되고 현재 URL에 세션 ID가 없는 경우 주소만 변경
-        if (response.session_id && !sessionId) {
-          // window.history.pushState(null, "", `/chat/${response.session_id}`);
-          setSessionId(response.session_id);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        // 스트리밍 효과로 응답 표시
-        let charIndex = 0;
-        streamContentRef.current = "";
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
 
-        streamIntervalRef.current = setInterval(() => {
-          if (charIndex < responseText.length) {
-            streamContentRef.current += responseText[charIndex];
-            setMessages((prev) =>
-              prev.map((msg) =>
-                msg.id === newMessageId + 1
-                  ? { ...msg, content: streamContentRef.current }
-                  : msg
-              )
-            );
-            charIndex++;
-          } else {
-            clearInterval(streamIntervalRef.current!);
+        const addContent = async (content: string, author: string) => {
+          startStreamingMessage(author);
+          let charIndex = 0;
+          streamIntervalRef.current = setInterval(() => {
+            if (charIndex < content.length) {
+              charIndex++;
+              const partialText = content.substring(0, charIndex);
+              updateLastMessage(partialText);
+            } else {
+              clearInterval(streamIntervalRef.current!);
+              setIsStreaming(false);
+            }
+          }, 12);
+        };
+
+        if (reader) {
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+
+              if (done) break;
+
+              const chunk = decoder.decode(value, { stream: true });
+              const lines = chunk.split("\n");
+
+              for (const line of lines) {
+                if (line.startsWith("data: ")) {
+                  const data = line.slice(6);
+
+                  if (data === "[DONE]") {
+                    setIsStreaming(false);
+                    return;
+                  }
+
+                  try {
+                    let sseResponse: SSEResponse;
+                    try {
+                      sseResponse = JSON.parse(data) as SSEResponse;
+                    } catch (e) {
+                      const cleanedData = data
+                        .replace(/\n/g, "\\n")
+                        .replace(/\r/g, "\\r")
+                        .replace(/\t/g, "\\t");
+                      console.log("cleanedData🅾️", cleanedData);
+                      sseResponse = JSON.parse(cleanedData) as SSEResponse;
+                    }
+
+                    console.log("🟢", sseResponse);
+                    if (sseResponse.type === "start") {
+                      continue;
+                    }
+                    if (sseResponse.type === "completion") {
+                      setIsStreaming(false);
+                      return;
+                    }
+
+                    if (
+                      sseResponse.event_type === "text_generation" &&
+                      sseResponse.content
+                    ) {
+                      addContent(sseResponse.content, "assistant");
+                      continue;
+                    }
+
+                    if (
+                      sseResponse.event_type === "function_call_request" &&
+                      sseResponse.tool_calls
+                    ) {
+                      sseResponse.tool_calls.forEach((toolCall) => {
+                        pushToolMessage({
+                          timestamp: sseResponse.timestamp,
+                          tool_call: toolCall,
+                        });
+                      });
+                      continue;
+                    }
+
+                    if (
+                      sseResponse.event_type === "function_response" &&
+                      sseResponse.tool_responses
+                    ) {
+                      sseResponse.tool_responses.forEach((toolCall) => {
+                        pushToolMessage({
+                          timestamp: sseResponse.timestamp,
+                          tool_response: toolCall,
+                        });
+                      });
+                      continue;
+                    }
+
+                    if (sseResponse.type === "error" && sseResponse.error) {
+                      const toolName = `error`;
+                      const result = `error: ${sseResponse.error}`;
+                      addContent(`${toolName} \n ${result}`, "assistant");
+                      continue;
+                    }
+                  } catch (e) {
+                    // JSON 파싱 실패 시 무시
+                    console.warn("❌ Failed to parse SSE data:", data, e);
+                  }
+                }
+              }
+            }
+          } finally {
+            reader.releaseLock();
             setIsStreaming(false);
           }
-        }, 30);
-      } catch (error: unknown) {
-        console.error("API 호출 오류:", error);
-
-        // 오류 메시지 표시
-        const errorMessage =
-          error instanceof Error
-            ? `오류가 발생했습니다: ${(error as Error).message}`
-            : "알 수 없는 오류가 발생했습니다.";
-
-        setMessages((prev) =>
-          prev.map((msg) =>
-            msg.id === newMessageId + 1
-              ? { ...msg, content: errorMessage }
-              : msg
-          )
-        );
+        }
+      } catch (error) {
+        console.error("SSE request failed:", error);
+        toast.error("Failed to send message");
         setIsStreaming(false);
+        clearStreamingMessage();
       }
     }
   };
 
   return {
     messages,
+    onSubmit,
     isStreaming,
-    setPrompt,
-    streamResponse,
-    isFirstResponse,
+    isNewChat,
     prompt,
+    setPrompt,
+    scrollToBottomRef,
   };
 };
-
-export default useChat;

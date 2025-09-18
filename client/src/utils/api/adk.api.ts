@@ -26,6 +26,29 @@ export async function sendChatMessage(message: string, session_id?: string) {
     return null;
   }
 }
+export async function sendChatStreamingMessage(
+  message: string,
+  session_id?: string
+) {
+  try {
+    const requestBody = {
+      message,
+      session_id,
+    } as { message: string; session_id?: string };
+
+    const response = await axios.post("/api/adk/streaming", requestBody);
+
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      console.error("채팅 실패:", response.data);
+      return null;
+    }
+  } catch (error) {
+    console.error("요청 실패:", error);
+    return null;
+  }
+}
 
 // 세션 목록 가져오기 API 호출 함수
 export async function fetchSessions(
