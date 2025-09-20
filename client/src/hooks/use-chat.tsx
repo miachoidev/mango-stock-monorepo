@@ -93,12 +93,6 @@ export const useChat = (sessionId?: string | null) => {
                 if (line.startsWith("data: ")) {
                   const data = line.slice(6);
 
-                  if (data === "[DONE]") {
-                    console.log("🟢[DONE]");
-                    setIsStreaming(false);
-                    return;
-                  }
-
                   try {
                     let sseResponse: SSEResponse;
                     try {
@@ -108,20 +102,24 @@ export const useChat = (sessionId?: string | null) => {
                         .replace(/\n/g, "\\n")
                         .replace(/\r/g, "\\r")
                         .replace(/\t/g, "\\t");
-                      console.log("cleanedData🅾️", cleanedData);
+
                       sseResponse = JSON.parse(cleanedData) as SSEResponse;
                     }
 
                     console.log("🟢", sseResponse);
-
-                    const contents = sseResponse.event.content?.parts || [];
-
                     if (sseResponse.status === "completed") {
                       return;
                     }
 
+                    if (sseResponse.error) {
+                      const result = `error: ${sseResponse.error}`;
+                      addContent(result, "assistant");
+                      continue;
+                    }
+
+                    const contents = sseResponse.event.content?.parts || [];
+
                     if (sseResponse.event?.partial) {
-                      console.log("🟢[PARTIAL]", contents);
                       contents.forEach((content) => {
                         if (content.text) {
                           currentContent += content.text;
@@ -154,13 +152,6 @@ export const useChat = (sessionId?: string | null) => {
                         });
                       }
                     });
-
-                    if (sseResponse.error) {
-                      const toolName = `error`;
-                      const result = `error: ${sseResponse.error}`;
-                      addContent(`${toolName} \n ${result}`, "assistant");
-                      continue;
-                    }
                   } catch (e) {
                     // JSON 파싱 실패 시 무시
                     console.warn("❌ Failed to parse SSE data:", data, e);
