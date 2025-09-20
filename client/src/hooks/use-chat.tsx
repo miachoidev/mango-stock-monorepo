@@ -111,49 +111,30 @@ export const useChat = (sessionId?: string | null) => {
                     }
 
                     console.log("🟢", sseResponse);
-                    if (sseResponse.type === "start") {
-                      continue;
-                    }
-                    if (sseResponse.type === "completion") {
-                      setIsStreaming(false);
-                      return;
-                    }
 
-                    if (
-                      sseResponse.event_type === "text_generation" &&
-                      sseResponse.content
-                    ) {
-                      addContent(sseResponse.content, "assistant");
-                      continue;
-                    }
+                    const contents = sseResponse.event.content.parts;
 
-                    if (
-                      sseResponse.event_type === "function_call_request" &&
-                      sseResponse.tool_calls
-                    ) {
-                      sseResponse.tool_calls.forEach((toolCall) => {
+                    contents.forEach((content) => {
+                      if (content.text) {
+                        addContent(content.text, "assistant");
+                        return;
+                      }
+
+                      if (content.functionCall) {
                         pushToolMessage({
-                          timestamp: sseResponse.timestamp,
-                          tool_call: toolCall,
+                          timestamp: sseResponse.event.timestamp,
+                          tool_call: content.functionCall,
                         });
-                      });
-                      continue;
-                    }
-
-                    if (
-                      sseResponse.event_type === "function_response" &&
-                      sseResponse.tool_responses
-                    ) {
-                      sseResponse.tool_responses.forEach((toolCall) => {
+                      }
+                      if (content.functionResponse) {
                         pushToolMessage({
-                          timestamp: sseResponse.timestamp,
-                          tool_response: toolCall,
+                          timestamp: sseResponse.event.timestamp,
+                          tool_response: content.functionResponse,
                         });
-                      });
-                      continue;
-                    }
+                      }
+                    });
 
-                    if (sseResponse.type === "error" && sseResponse.error) {
+                    if (sseResponse.error) {
                       const toolName = `error`;
                       const result = `error: ${sseResponse.error}`;
                       addContent(`${toolName} \n ${result}`, "assistant");

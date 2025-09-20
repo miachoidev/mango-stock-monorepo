@@ -22,7 +22,7 @@ import {
   Brain,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import useChat from "@/hooks/use-chat";
+import { useChat } from "@/hooks/use-chat";
 import { useRouter, useSearchParams } from "next/navigation";
 import { STOCK_TEMPLATE } from "@/utils/template";
 
@@ -111,16 +111,16 @@ const StockDetail = () => {
     };
   }, [chartData]);
 
-  const { streamResponse } = useChat();
+  const { onSubmit } = useChat();
 
   const onClickAnalyzeStock = () => {
     const newMessage = STOCK_TEMPLATE.aiTemplate(name, code);
-    streamResponse(newMessage);
+    onSubmit(newMessage);
   };
 
   const onClickInvestAdvice = () => {
     const newMessage = STOCK_TEMPLATE.investAdviceTemplate(name, code);
-    streamResponse(newMessage);
+    onSubmit(newMessage);
   };
 
   const handleTrade = (type: "buy" | "sell") => {

@@ -18,6 +18,10 @@ import { PromptScrollButton } from "@/components/ui/custom/prompt/scroll-button"
 import Mango from "@/components/chat/mango";
 import { STOCK_TEMPLATE } from "@/utils/template";
 import { useChat } from "@/hooks/use-chat";
+import { ToolMessageContent } from "@/components/chat/message/tool-message";
+import { UserMessageContent } from "@/components/chat/message/user-message";
+import { ToolMessage } from "@/types/message";
+import { SystemMessageContent } from "@/components/chat/message/system-message";
 
 export default function AppRender({
   sessionId: initialSessionId,
@@ -55,54 +59,48 @@ export default function AppRender({
   };
   return (
     <div className="flex h-full w-full flex-col items-center justify-center space-y-4 p-4 mx-auto max-w-screen-lg">
+      {messages.length === 0 && (
+        <div className="flex flex-col items-center justify-center h-full w-full">
+          <div className="flex flex-col items-center justify-center">
+            <div className="text-lg font-medium text-gray-400">
+              AI Agent 주식 투자 에이전트
+            </div>
+            <div className="text-3xl mt-2 font-bold text-white">망고 스톡</div>
+          </div>
+          <div className="mt-10 w-full h-full justify-center items-center flex overflow-x-hidden overflow-y-hidden">
+            <Mango />
+          </div>
+        </div>
+      )}
       <ChatContainer
-        className={cn("relative w-full flex-1 space-y-4 py-10")}
+        className={cn(
+          "relative w-full flex-1 space-y-4 py-4 px-20 m-auto flex"
+        )}
         ref={containerRef}
         scrollToRef={bottomRef}
       >
-        {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full">
-            <div className="flex flex-col items-center justify-center">
-              <div className="text-lg font-medium text-gray-400">
-                AI Agent 주식 투자 에이전트
-              </div>
-              <div className="text-3xl mt-2 font-bold text-white">
-                망고 스톡
-              </div>
-            </div>
-            <div className="mt-10 w-full h-full justify-center items-center flex overflow-x-hidden overflow-y-hidden">
-              <Mango />
-            </div>
-          </div>
-        )}
-        {messages.map((message) => {
-          const isAssistant = message.role === "assistant";
-          return (
-            <Message
-              key={message.id}
-              className={
-                message.role === "user" ? "justify-end" : "justify-start"
-              }
-            >
-              <div
-                className={cn("max-w-[95%] flex-1", {
-                  "justify-end text-end": !isAssistant,
-                })}
-              >
-                {isAssistant ? (
-                  <div className="text-foreground prose rounded-lg px-3 py-2">
-                    <Markdown className={"space-y-4 text-white text-sm"}>
-                      {message.content || ""}
-                    </Markdown>
-                  </div>
-                ) : (
-                  <MessageContent className="bg-[#fdbe02] text-black inline-flex text-start rounded-xl text-sm">
-                    {message.content || ""}
-                  </MessageContent>
-                )}
-              </div>
-            </Message>
-          );
+        {messages.map((message, idx) => {
+          if (message.role === "tool") {
+            return (
+              <ToolMessageContent
+                key={idx}
+                message={message as ToolMessage}
+                messages={messages}
+              />
+            );
+          }
+          if (message.role === "assistant") {
+            return (
+              <SystemMessageContent
+                className="mt-5"
+                key={idx}
+                message={message}
+              />
+            );
+          }
+          if (message.role === "user") {
+            return <UserMessageContent key={idx} message={message} />;
+          }
         })}
 
         {isStreaming && (

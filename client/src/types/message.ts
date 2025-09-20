@@ -55,9 +55,6 @@ export class SystemMessage extends Message {
 export class ToolMessage extends Message {
   role = "tool" as const;
 
-  function_response?: FunctionResponse;
-  function_call?: FunctionCall;
-
   tool_call?: ToolCall;
   tool_response?: ToolResponse;
 
@@ -66,8 +63,6 @@ export class ToolMessage extends Message {
     author,
     isNew = false,
     timestamp,
-    function_response,
-    function_call,
     tool_call,
     tool_response,
   }: {
@@ -75,14 +70,10 @@ export class ToolMessage extends Message {
     author?: string;
     isNew?: boolean;
     timestamp?: string;
-    function_response?: FunctionResponse;
-    function_call?: FunctionCall;
     tool_call?: ToolCall;
     tool_response?: ToolResponse;
   }) {
     super({ content, author, isNew, timestamp });
-    this.function_response = function_response;
-    this.function_call = function_call;
     this.tool_call = tool_call;
     this.tool_response = tool_response;
   }
