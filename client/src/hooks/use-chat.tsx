@@ -79,6 +79,7 @@ export const useChat = (sessionId?: string | null) => {
         };
 
         if (reader) {
+          let currentContent = "";
           try {
             while (true) {
               const { done, value } = await reader.read();
@@ -93,6 +94,7 @@ export const useChat = (sessionId?: string | null) => {
                   const data = line.slice(6);
 
                   if (data === "[DONE]") {
+                    console.log("🟢[DONE]");
                     setIsStreaming(false);
                     return;
                   }
@@ -112,7 +114,26 @@ export const useChat = (sessionId?: string | null) => {
 
                     console.log("🟢", sseResponse);
 
-                    const contents = sseResponse.event.content.parts;
+                    const contents = sseResponse.event.content?.parts || [];
+
+                    if (sseResponse.status === "completed") {
+                      return;
+                    }
+
+                    if (sseResponse.event?.partial) {
+                      console.log("🟢[PARTIAL]", contents);
+                      contents.forEach((content) => {
+                        if (content.text) {
+                          currentContent += content.text;
+                        }
+                      });
+                      continue;
+                    }
+                    if (currentContent) {
+                      addContent(currentContent, "assistant");
+                      currentContent = "";
+                      continue;
+                    }
 
                     contents.forEach((content) => {
                       if (content.text) {
@@ -149,6 +170,11 @@ export const useChat = (sessionId?: string | null) => {
             }
           } finally {
             reader.releaseLock();
+            if (currentContent) {
+              addContent(currentContent, "assistant");
+              currentContent = "";
+              return;
+            }
             setIsStreaming(false);
           }
         }

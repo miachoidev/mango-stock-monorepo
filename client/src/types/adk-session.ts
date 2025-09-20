@@ -1,5 +1,6 @@
 export interface SSEResponse {
   event: EventType;
+  status: "streaming" | "completed";
   session_id: string;
   error: string;
 }
@@ -15,6 +16,7 @@ interface EventType {
   invocationId: string;
   timestamp: string;
   error: string;
+  partial?: boolean;
 }
 
 interface PartType {
@@ -30,6 +32,7 @@ export interface ToolCall {
     agent_name: string;
     [key: string]: any;
 
+    // stock_analysis_result
     stock_code?: string;
     stock_name?: string;
     average_price?: number;
@@ -39,8 +42,26 @@ export interface ToolCall {
     profit_loss_rate?: number;
     reasons?: string[];
     recommendation?: "홀딩" | "매도" | "매수";
+
+    // stock_recommendation_result
+    investment_strategy?: string;
+    market_flow?: string;
+    popular_themes?: string[];
+
+    rocommended_stocks: {
+      종목코드: string;
+      종목명: string;
+      현재가: string;
+      손절가: string;
+      테마: string;
+      상승률: string;
+      "추천 등급": string;
+      "투자 근거": string;
+      목표가: string;
+    }[];
   };
 }
+
 export interface ToolResponse {
   id: string;
   name: string;

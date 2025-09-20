@@ -92,7 +92,7 @@ export default function AppRender({
           if (message.role === "assistant") {
             return (
               <SystemMessageContent
-                className="mt-5"
+                // className="mt-5"
                 key={idx}
                 message={message}
               />

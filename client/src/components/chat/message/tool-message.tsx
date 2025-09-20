@@ -3,6 +3,7 @@ import { MessageContentProps, MessageContents } from "./message";
 import { cn } from "@/lib/utils";
 import { Orbit } from "lucide-react";
 import { Message, ToolMessage } from "@/types/message";
+import { useRouter } from "next/navigation";
 
 export const ToolMessageContent = ({
   message,
@@ -29,6 +30,9 @@ export const ToolMessageContent = ({
         </div>
       );
     }
+    if (message.tool_call?.name === "stock_recommendation_result") {
+      return <StockRecommendationResult message={message} />;
+    }
     if (message.tool_call?.name === "stock_analysis_result") {
       return <StockAnalysisResult message={message} />;
     }
@@ -52,8 +56,7 @@ export const ToolMessageContent = ({
 };
 
 const CallToolMessage = ({ message }: { message: ToolMessage }) => {
-  const originalTitle = message.tool_call?.name || "";
-  const [title, setTitle] = useState<string>(originalTitle);
+  const [title, setTitle] = useState<string>(message.tool_call?.name || "");
 
   return (
     <MessageContents message={message} timestamp={false}>
@@ -70,14 +73,26 @@ const CallToolMessage = ({ message }: { message: ToolMessage }) => {
 };
 
 const StockAnalysisResult = ({ message }: { message: ToolMessage }) => {
-  if (!message.tool_call?.args) return;
+  const router = useRouter();
+  const onClickStock = () => {
+    if (
+      !message.tool_call?.args?.stock_code ||
+      !message.tool_call?.args?.stock_name
+    )
+      return;
+    router.push(
+      `/stock/detail?code=${message.tool_call?.args?.stock_code}&name=${message.tool_call?.args?.stock_name}`
+    );
+  };
 
+  if (!message.tool_call?.args) return;
   return (
     <div
       className={cn(
-        "w-full min-w-[300px] bg-[#ffcd48] break-words rounded-xl p-2",
-        "border-gray-300 pl-2 py-2 text-xs text-black font-semibold"
+        "w-full min-w-[300px] bg-[#ffcd48] hover:bg-[#ffcd48]/80 break-words rounded-xl p-2",
+        "border-gray-300 pl-2 py-2 text-xs text-black font-semibold cursor-pointer"
       )}
+      onClick={onClickStock}
     >
       <div className="flex flex-col gap-1 text-black">
         <div className="text-lg font-bold">
@@ -107,6 +122,77 @@ const StockAnalysisResult = ({ message }: { message: ToolMessage }) => {
         </div>
         <div className="">
           홀딩 여부 : {message.tool_call?.args?.is_holding ? "홀딩" : "미홀딩"}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const StockRecommendationResult = ({ message }: { message: ToolMessage }) => {
+  const router = useRouter();
+
+  if (!message.tool_call?.args) return;
+
+  const onClickStock = (stock: any) => {
+    if (!stock["종목코드"] || !stock["종목명"]) return;
+    router.push(
+      `/stock/detail?code=${stock["종목코드"]}&name=${stock["종목명"]}`
+    );
+  };
+
+  return (
+    <div
+      className={cn(
+        "w-full min-w-[300px] bg-[#ffcd48] break-words rounded-xl p-2",
+        "border-gray-300 pl-2 py-2 text-xs text-black font-semibold cursor-pointer"
+      )}
+    >
+      <div className="flex flex-col gap-1 text-black">
+        <div className=" text-blue-800 font-bold text-lg">추천 테마</div>
+        <div className="border-b border-gray-900 pb-2">
+          {message.tool_call?.args?.popular_themes?.map((theme, index) => (
+            <div key={theme} className="text-md font-medium">
+              {index + 1}. {theme}
+            </div>
+          ))}
+        </div>
+        <div className="text-md font-semibold mt-2">
+          {message.tool_call?.args?.market_flow}
+        </div>
+
+        <div className="text-xs font-medium mt-2">
+          {message.tool_call?.args?.investment_strategy}
+        </div>
+
+        <div className="text-xs font-medium mt-2 flex flex-col gap-2">
+          {message.tool_call?.args?.recommended_stocks?.map(
+            (stock: any, index: number) => (
+              <div
+                key={index}
+                onClick={() => onClickStock(stock)}
+                className="flex flex-col gap-1 bg-yellow-50 hover:bg-yellow-100 rounded-md p-2 cursor-pointer"
+              >
+                <div className="text-lg font-semibold text-blue-800">
+                  {stock["종목명"]} ({stock["종목코드"]})
+                </div>
+                <div className="text-sm font-medium">
+                  현재가: {stock["현재가"].toLocaleString()}원
+                </div>
+                <div className="text-sm font-medium">
+                  상승률: {stock["상승률"].toLocaleString()}%
+                </div>
+                <div className="text-sm font-medium">
+                  추천 등급: {stock["추천 등급"]}
+                </div>
+                <div className="text-sm font-medium">
+                  투자 근거: {stock["투자 근거"]}
+                </div>
+                {/* <div className="text-sm font-medium">
+                  목표가: {stock["목표가"].toLocaleString()}원
+                </div> */}
+              </div>
+            )
+          )}
         </div>
       </div>
     </div>
