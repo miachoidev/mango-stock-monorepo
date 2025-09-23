@@ -4,10 +4,10 @@
 
 <img width="3146" height="1828" alt="image" src="https://github.com/user-attachments/assets/d3261adb-2920-4803-851b-2a8e6fae00a4" />
 
-
 ## 서비스 소개
 
 AI 주식 투자 어시스턴트는 개인 투자자들이 복잡한 주식 시장에서 더 나은 투자 결정을 내릴 수 있도록 돕는 멀티 에이전트 기반 서비스입니다. 키움증권 API와 ADK(Agent Development Kit)를 활용하여 실시간 데이터 분석과 맞춤형 투자 조언을 제공합니다.
+서버 주소 : https://github.com/bbnerino/mango-stock-server
 
 ## 왜 이 서비스가 필요한가?
 
