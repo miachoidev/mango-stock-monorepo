@@ -11,7 +11,7 @@ export default function ChatLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [stockOpen, setStockOpen] = useState(true);
+  const [stockOpen, setStockOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 

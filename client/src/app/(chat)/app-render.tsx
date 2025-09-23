@@ -10,8 +10,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowUpIcon, SquareIcon } from "lucide-react";
 import { ChatContainer } from "@/components/ui/custom/prompt/chat-container";
-import { Message, MessageContent } from "@/components/ui/custom/prompt/message";
-import { Markdown } from "@/components/ui/custom/prompt/markdown";
 import { cn } from "@/lib/utils";
 import { PromptLoader } from "@/components/ui/custom/prompt/loader";
 import { PromptScrollButton } from "@/components/ui/custom/prompt/scroll-button";
@@ -72,43 +70,45 @@ export default function AppRender({
           </div>
         </div>
       )}
-      <ChatContainer
-        className={cn(
-          "relative w-full flex-1 space-y-4 py-4 px-20 m-auto flex"
-        )}
-        ref={containerRef}
-        scrollToRef={bottomRef}
-      >
-        {messages.map((message, idx) => {
-          if (message.role === "tool") {
-            return (
-              <ToolMessageContent
-                key={idx}
-                message={message as ToolMessage}
-                messages={messages}
-              />
-            );
-          }
-          if (message.role === "assistant") {
-            return (
-              <SystemMessageContent
-                // className="mt-5"
-                key={idx}
-                message={message}
-              />
-            );
-          }
-          if (message.role === "user") {
-            return <UserMessageContent key={idx} message={message} />;
-          }
-        })}
+      {messages.length > 0 && (
+        <ChatContainer
+          className={cn(
+            "relative w-full flex-1 space-y-4 py-4 px-20 m-auto flex"
+          )}
+          ref={containerRef}
+          scrollToRef={bottomRef}
+        >
+          {messages.map((message, idx) => {
+            if (message.role === "tool") {
+              return (
+                <ToolMessageContent
+                  key={idx}
+                  message={message as ToolMessage}
+                  messages={messages}
+                />
+              );
+            }
+            if (message.role === "assistant") {
+              return (
+                <SystemMessageContent
+                  // className="mt-5"
+                  key={idx}
+                  message={message}
+                />
+              );
+            }
+            if (message.role === "user") {
+              return <UserMessageContent key={idx} message={message} />;
+            }
+          })}
 
-        {isStreaming && (
-          <div className="ps-2">
-            <PromptLoader variant="pulse-dot" className="bg-white" />
-          </div>
-        )}
-      </ChatContainer>
+          {isStreaming && (
+            <div className="ps-2">
+              <PromptLoader variant="pulse-dot" className="bg-white" />
+            </div>
+          )}
+        </ChatContainer>
+      )}
 
       <div className="fixed right-4 bottom-4">
         <PromptScrollButton

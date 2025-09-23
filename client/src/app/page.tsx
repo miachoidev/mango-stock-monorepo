@@ -14,13 +14,14 @@ export default function Home() {
     }
   };
   return (
-    <div className="flex w-full h-[100vh] justify-center items-center">
+    <div className="flex w-full h-[100vh] justify-center items-center bg-[#333] flex-col gap-4">
       {/* <Link href="/chat">Chat</Link> */}
+      <div className="text-white text-4xl font-bold">망고 스톡</div>
       <button
-        className="bg-purple-500 text-white p-5 rounded-md text-2xl font-bold"
+        className="bg-yellow-500 text-gray-800 px-5 py-1 rounded-full text-xl font-semibold hover:bg-yellow-600"
         onClick={handleLogin}
       >
-        Login
+        시작하기
       </button>
     </div>
   );

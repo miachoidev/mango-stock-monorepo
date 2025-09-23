@@ -104,35 +104,24 @@ const StockAnalysisResult = ({ message }: { message: ToolMessage }) => {
         </div>
         {message.tool_call?.args?.average_price && (
           <div className="">
-            평균가 : {message.tool_call?.args?.average_price?.toLocaleString()}{" "}
-            원
+            평균가 : {message.tool_call?.args?.average_price} 원
           </div>
         )}
         {message.tool_call?.args?.current_price && (
           <div className="">
-            현재가 : {message.tool_call?.args?.current_price?.toLocaleString()}{" "}
-            원
+            현재가 : {message.tool_call?.args?.current_price} 원
           </div>
         )}
         {message.tool_call?.args?.profit_loss_amount && (
           <div className="">
-            평가금액 :{" "}
-            {message.tool_call?.args?.profit_loss_amount?.toLocaleString()} 원
+            평가금액 : {message.tool_call?.args?.profit_loss_amount} 원
           </div>
         )}
         {message.tool_call?.args?.profit_loss_rate && (
           <div className="">
-            평가금액 :{" "}
-            {message.tool_call?.args?.profit_loss_rate?.toLocaleString()} 원
+            평가금액 : {message.tool_call?.args?.profit_loss_rate} 원
           </div>
         )}
-        <div className=" mt-5">
-          <div className="flex flex-col gap-1">
-            {message.tool_call?.args?.reasons?.map((reason) => (
-              <div key={reason}>- {reason}</div>
-            ))}
-          </div>
-        </div>
         {message.tool_call?.args?.reasons && (
           <div className=" mt-5">
             <div className="flex flex-col gap-1">
@@ -199,10 +188,10 @@ const StockRecommendationResult = ({ message }: { message: ToolMessage }) => {
                   {stock["종목명"]} ({stock["종목코드"]})
                 </div>
                 <div className="text-sm font-medium">
-                  현재가: {stock["현재가"].split("+")[1].toLocaleString()} 원
+                  현재가: {stock["현재가"]}
                 </div>
                 <div className="text-sm font-medium">
-                  상승률: {stock["상승률"].toLocaleString()}%
+                  상승률: {stock["상승률"]}
                 </div>
                 <div className="text-sm font-medium">
                   추천 등급: {stock["추천 등급"]}
