@@ -14,14 +14,16 @@
 - [핵심 기능](#-핵심-기능)
 - [기술 스택](#-기술-스택)
 - [시스템 아키텍처](#-시스템-아키텍처)
-- [프로젝트 구조](#-프로젝트-구조)
-- [주요 기능 상세](#-주요-기능-상세)
 - [시작하기](#-시작하기)
 - [기여자](#-기여자)
 
 ---
 
 ## 🎯 프로젝트 소개
+
+### 실전 AI 에이전트 프로덕트
+
+**Mango Stock**은 실제로 동작하는 프로덕션 레벨의 멀티 에이전트 시스템입니다. **5개의 실전 AI 에이전트**(Root Agent + 4개 전문 Sub Agents)가 협력하여 복잡한 주식 분석 업무를 자동화하고, 사용자에게 데이터 기반의 투자 조언을 제공합니다.
 
 ### 문제 정의
 
@@ -36,47 +38,10 @@
 
 **멀티 에이전트 시스템**을 통해 각 전문 분야의 AI 에이전트가 협력하여 종합적인 투자 분석을 제공합니다. 마치 회사에서 마케팅팀, 개발팀, 기획팀이 협력하듯 각 에이전트가 전문 분야에서 소통하며 협업합니다.
 
----
-
-## 🎨 에이전트 상세
-
-### 1. 종목 분석 에이전트 (Stock Analyzer Agent)
-
-**기능:**
-- 보유 종목의 평단가, 손익률, 수익률 분석
-- 기술적 분석: 차트 패턴, 이동평균, 거래량 분석
-- 수급 분석: 기관/외국인 매매 동향, 프로그램 매매 추이
-- 공매도 분석: 공매도 잔고 및 추세 분석
-- 업종 비교: 해당 종목의 업종 대비 상대 강도 분석
-
-**출력:**
-- 매수/매도/홀딩 의견
-- 근거 설명 (3가지 이상)
-- 목표가 및 손절가 제시
-
-### 2. 섹터 분석 에이전트 (Sector Analyzer Agent)
-
-**기능:**
-- 업종별 강세/약세 분석
-- 테마주 탐지 및 분석
-- 섹터 로테이션 분석
-- 업종별 상대 강도 비교
-
-### 3. 수급 분석 에이전트 (Supply Demand Analyzer Agent)
-
-**기능:**
-- 기관 투자자 매매 동향 추적
-- 외국인 투자자 매매 동향 추적
-- 프로그램 매매 추이 분석
-- 대형주/중형주/소형주별 수급 분석
-
-### 4. 거래량 분석 에이전트 (Volume Analyzer Agent)
-
-**기능:**
-- 거래량 급증 종목 탐지
-- 급등/급락 종목 분석
-- 모멘텀 지표 분석
-- 거래량 패턴 분석
+**핵심 특징:**
+- ✅ **5개의 실전 에이전트**: Root Agent + 4개 전문 Sub Agents (종목/섹터/수급/거래량 분석)
+- ✅ **프로덕션 레벨**: 실제 사용 가능한 완전한 서비스
+- ✅ **자동화된 워크플로우**: 복잡한 분석 업무를 에이전트가 자동 처리
 
 ---
 
@@ -113,6 +78,17 @@
 
 ## 🛠 기술 스택
 
+### AI & 에이전트
+
+| 카테고리 | 기술 |
+|---------|------|
+| **AI Framework** | Google ADK (Agent Development Kit) |
+| **LLM API** | Google Gemini 2.5 Flash |
+| **에이전트 오케스트레이션** | ADK Runner & Session Management |
+| **프롬프트 엔지니어링** | 구조화된 프롬프트 템플릿 & 최적화 |
+| **도구 통합** | Function Tools (10+ 키움증권 API 모듈) |
+| **실전 에이전트 수** | 5개 (Root + 4개 Sub Agents) |
+
 ### Frontend (`client/`)
 
 | 카테고리 | 기술 |
@@ -132,12 +108,10 @@
 
 | 카테고리 | 기술 |
 |---------|------|
-| **AI Framework** | Google ADK (Agent Development Kit) |
-| **LLM** | Google Gemini 2.5 Flash |
 | **API Framework** | FastAPI |
 | **Language** | Python 3.12+ |
 | **Package Manager** | UV |
-| **Stock API** | 키움증권 REST API |
+| **Stock API** | 키움증권 REST API (10+ 엔드포인트 통합) |
 | **Database** | SQLite (ADK 세션 관리) |
 | **Real-time** | Server-Sent Events (SSE) |
 
@@ -199,16 +173,22 @@ graph TB
     style Volume fill:#f5e1ff
 ```
 
-### 에이전트 협업 프로세스
+### 실전 에이전트 구현
 
-1. **사용자 질문 입력** → 클라이언트에서 자연어 질문 입력
-2. **API 요청** → Next.js API Route를 통해 FastAPI 서버로 전송
-3. **Root Agent 분석** → 질문 유형 분석 및 토큰 발급
-4. **에이전트 선택** → 질문 유형에 맞는 전문 에이전트 선택
-5. **데이터 수집** → 각 에이전트가 키움증권 API를 통해 데이터 수집
-6. **AI 분석** → Google Gemini를 통해 수집된 데이터 분석
-7. **결과 통합** → Root Agent가 모든 에이전트의 결과를 통합
-8. **응답 전송** → 스트리밍 또는 일반 응답으로 클라이언트에 전송
+이 프로젝트는 **5개의 실전 AI 에이전트**를 구현한 멀티 에이전트 시스템입니다:
+
+1. **Root Agent (메인 코디네이터)**: 사용자 질문 분석, 적절한 에이전트 라우팅, 키움증권 API 토큰 관리, 결과 통합
+2. **Stock Analyzer Agent**: 보유 종목 분석, 기술적 분석, 수급 분석, 공매도 분석
+3. **Sector Analyzer Agent**: 업종별 강세/약세 분석, 테마주 탐지, 섹터 로테이션 분석
+4. **Supply Demand Analyzer Agent**: 기관/외국인 투자자 매매 동향 추적, 프로그램 매매 분석
+5. **Volume Analyzer Agent**: 거래량 급증 종목 탐지, 급등/급락 분석, 모멘텀 지표 분석
+
+### 프롬프트 엔지니어링 & 시스템 설계
+
+- **도메인 특화 프롬프트**: 각 에이전트가 담당하는 분야에 맞춘 전문 프롬프트 설계 및 최적화
+- **구조화된 출력**: JSON 형식의 일관된 응답 구조로 파싱 및 후처리 용이
+- **확장 가능한 아키텍처**: 새로운 에이전트 추가 시 기존 시스템에 영향 없이 확장 가능
+- **도구 모듈화**: 10개 이상의 키움증권 API 도구를 모듈화하여 재사용성 극대화
 
 ### 멀티 에이전트의 장점
 
@@ -216,60 +196,6 @@ graph TB
 - ✅ **신뢰성**: 에이전트들이 서로의 결과를 검토하고 보완하여 실수나 편향을 줄임
 - ✅ **확장성**: 새로운 기능이 필요할 때 해당 분야 에이전트만 추가하면 됨
 - ✅ **정확성**: 일반 답변보다 토큰을 많이 사용하지만, 그만큼 전문성 있는 답변 가능
-
----
-
-## 📁 프로젝트 구조
-
-```
-mango-stock-monorepo/
-├── client/                          # Next.js 프론트엔드
-│   ├── src/
-│   │   ├── app/                    # Next.js App Router
-│   │   │   ├── api/               # API Routes
-│   │   │   │   ├── adk/          # ADK 서버 연동
-│   │   │   │   └── kiwoom/       # 키움 API 연동
-│   │   │   ├── stock/            # 주식 관련 페이지
-│   │   │   │   ├── page.tsx      # 주식 메인 페이지
-│   │   │   │   ├── detail/       # 종목 상세 페이지
-│   │   │   │   ├── watchlist/    # 관심 종목 페이지
-│   │   │   │   └── stock-trade/  # 매매 페이지
-│   │   │   └── (chat)/          # AI 채팅 페이지
-│   │   ├── components/           # React 컴포넌트
-│   │   │   ├── chat/            # 채팅 UI 컴포넌트
-│   │   │   ├── stock/           # 주식 관련 컴포넌트
-│   │   │   └── ui/              # 공통 UI 컴포넌트
-│   │   ├── hooks/               # Custom Hooks
-│   │   ├── types/               # TypeScript 타입 정의
-│   │   └── utils/               # 유틸리티 함수
-│   │       └── api/             # API 호출 함수들
-│   ├── package.json
-│   └── README.md
-│
-├── server/                         # Python 백엔드
-│   ├── stock/                     # 주식 분석 에이전트
-│   │   ├── agent.py             # Root Agent 정의
-│   │   ├── prompt.py            # Root Agent 프롬프트
-│   │   ├── sub_agents/          # 서브 에이전트들
-│   │   │   ├── stock_analyzer/      # 종목 분석 에이전트
-│   │   │   ├── sector_analyzer/     # 섹터 분석 에이전트
-│   │   │   ├── supply_demand_analyzer/  # 수급 분석 에이전트
-│   │   │   └── volume_analyzer/     # 거래량 분석 에이전트
-│   │   └── utils/
-│   │       └── tools/            # 키움 API 도구들
-│   │           ├── kiwoom_auth_tools.py
-│   │           ├── kiwoom_account_tools.py
-│   │           ├── kiwoom_chart_tools.py
-│   │           ├── kiwoom_market_tools.py
-│   │           └── ...
-│   ├── database/                  # SQLite 데이터베이스
-│   ├── main.py                   # FastAPI 서버 진입점
-│   ├── pyproject.toml           # Python 프로젝트 설정
-│   └── README.md
-│
-├── merge-repos.sh                # 모노레포 병합 스크립트
-└── README.md                    # 프로젝트 메인 README
-```
 
 ---
 
@@ -343,36 +269,57 @@ npm run dev
 
 클라이언트가 `http://localhost:3000`에서 실행됩니다.
 
-### API 키 발급 방법
+### API 키 발급
 
-#### Google API Key
-
-1. [Google Cloud Console](https://console.cloud.google.com/) 접속
-2. 프로젝트 생성 또는 선택
-3. **API 활성화**:
-   - "API 및 서비스" > "라이브러리" 이동
-   - "Generative Language API" 검색하여 **활성화**
-   - "Vertex AI API" 검색하여 **활성화**
-4. "API 및 서비스" > "사용자 인증 정보" 이동
-5. "+ 사용자 인증 정보 만들기" > "API 키" 선택
-6. 생성된 API 키를 `.env` 파일에 추가
-
-#### 키움증권 API Key
-
-1. [키움 REST API 가이드](https://openapi.kiwoom.com/guide/apiguide) 접속
-2. 키움증권 계정으로 로그인
-3. API 사용신청 진행
-4. 발급받은 App Key와 Secret Key를 `.env` 파일에 추가
+- **Google API Key**: [Google Cloud Console](https://console.cloud.google.com/)에서 Generative Language API와 Vertex AI API 활성화 후 API 키 발급
+- **키움증권 API Key**: [키움 REST API 가이드](https://openapi.kiwoom.com/guide/apiguide)에서 API 사용신청 후 App Key와 Secret Key 발급
 
 ---
 
 ## 👥 기여자
 
-이 프로젝트는 다음 기여자들의 작업을 통합한 모노레포입니다:
-
-- **서버 개발**: [bbnerino/mango-stock-server](https://github.com/bbnerino/mango-stock-server)
-- **클라이언트 개발**: [bbnerino/mango-stock-client](https://github.com/bbnerino/mango-stock-client)
-- **모노레포 통합**: [miachoidev/mango-stock-monorepo](https://github.com/miachoidev/mango-stock-monorepo)
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/miachoidev">
+        <img src="https://github.com/miachoidev.png" width="120px;" alt=""/>
+        <br />
+        <sub><b>miachoi</b></sub>
+      </a>
+      <br />
+      <b>🏗️ 멀티 에이전트 시스템 아키텍처 설계</b>
+      <br />
+      <sub>
+        <b>시스템 아키텍처 설계</b><br/>
+        멀티 에이전트 오케스트레이션 설계<br/>
+        에이전트별 도메인 특화 프롬프트 설계 & 최적화<br/>
+        구조화된 출력 및 컨텍스트 관리<br/>
+        LLM API & 도구 통합</b><br/>
+        Google Gemini API 활용<br/>
+        키움증권 API 10+ 도구 모듈 개발<br/>
+      </sub>
+    </td>
+    <td align="center">
+      <a href="https://github.com/hyunhong">
+        <img src="https://github.com/hyunhong.png" width="120px;" alt=""/>
+        <br />
+        <sub><b>현홍</b></sub>
+      </a>
+      <br />
+      <b>🎨 프론트엔드 & 서버 인프라</b>
+      <br />
+      <sub>
+        Next.js 15 기반 UI/UX 구현<br/>
+        AI 채팅 인터페이스 & 스트리밍<br/>
+        실시간 주식 데이터 시각화<br/>
+        종목 상세 & 차트 컴포넌트<br/>
+        관심 종목 & 보유 종목 관리<br/>
+        Google ADK 서버 틀 구축<br/>
+        반응형 디자인 & 애니메이션
+      </sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
