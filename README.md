@@ -151,39 +151,41 @@
 graph TB
     subgraph Client["🖥️ 클라이언트"]
         Pages["주요 페이지<br/>• 주식 메인<br/>• 종목 상세<br/>• 관심 종목<br/>• AI 채팅<br/>• 매매"]
-    end
-
-    subgraph Server["⚙️ 서버"]
-        FastAPI["FastAPI 서버"]
-        ADK["ADK Runner"]
-        FastAPI --> ADK
-    end
-
-    subgraph Agents["🤖 멀티 에이전트"]
-        Root["Root Agent"]
-        Stock["Stock Analyzer"]
-        Sector["Sector Analyzer"]
-        Supply["Supply Demand Analyzer"]
-        Volume["Volume Analyzer"]
         
-        Root --> Stock
-        Root --> Sector
-        Root --> Supply
-        Root --> Volume
+        subgraph Server["⚙️ 서버"]
+            FastAPI["FastAPI 서버"]
+            
+            subgraph ADK["🎯 ADK Runner"]
+                subgraph Agents["🤖 멀티 에이전트"]
+                    Root["Root Agent<br/>메인 코디네이터"]
+                    Stock["Stock Analyzer<br/>종목 분석<br/>• 계좌 평가 현황<br/>• 일봉 차트 분석<br/>• 기관/외국인 매매<br/>• 프로그램 매매<br/>• 공매도 추이"]
+                    Sector["Sector Analyzer<br/>섹터 분석<br/>• 업종별 강세/약세<br/>• 테마주 탐지<br/>• 섹터 로테이션"]
+                    Supply["Supply Demand Analyzer<br/>수급 분석<br/>• 기관 투자자 동향<br/>• 외국인 투자자 동향<br/>• 프로그램 매매 추이"]
+                    Volume["Volume Analyzer<br/>거래량 분석<br/>• 거래량 급증 탐지<br/>• 급등/급락 분석<br/>• 모멘텀 지표"]
+                    
+                    Root --> Stock
+                    Root --> Sector
+                    Root --> Supply
+                    Root --> Volume
+                end
+            end
+            
+            FastAPI --> ADK
+        end
     end
 
     subgraph External["🌐 외부 API"]
-        Kiwoom["키움증권 API"]
-        Gemini["Google Gemini"]
+        Kiwoom["키움증권 API<br/>REST API<br/>• 인증 토큰 발급<br/>• 계좌 정보 조회<br/>• 실시간 시세 데이터<br/>• 매매 주문 처리<br/>• 차트 데이터 조회<br/>• 기관/외국인 매매 추이"]
+        Gemini["Google Gemini<br/>LLM API<br/>• Gemini 2.5 Flash<br/>• 멀티 모달 처리<br/>• 자연어 분석<br/>• 데이터 기반 AI 분석<br/>• 투자 의견 생성"]
     end
 
     Client --> Server
-    ADK --> Agents
     Agents --> Kiwoom
     Agents --> Gemini
 
     style Client fill:#e1f5ff
     style Server fill:#ffe1f5
+    style ADK fill:#fff4e1
     style Agents fill:#e1ffe1
     style External fill:#f5e1ff
 ```
