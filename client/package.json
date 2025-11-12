@@ -1,0 +1,50 @@
+{
+  "name": "stock-project-client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@radix-ui/react-avatar": "^1.1.10",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "@tanstack/react-query": "5.87.4",
+    "@tanstack/react-query-devtools": "5.87.4",
+    "axios": "^1.12.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.2.2",
+    "framer-motion": "^12.23.12",
+    "js-cookie": "^3.0.5",
+    "lucide-react": "^0.542.0",
+    "marked": "^16.2.1",
+    "next": "15.5.2",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-markdown": "^10.1.0",
+    "recharts": "^3.2.0",
+    "remark-gfm": "^4.0.1",
+    "shiki": "^3.12.2",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.3.1",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/js-cookie": "^3.0.6",
+    "@types/marked": "^5.0.2",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.2",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5"
+  }
+}
