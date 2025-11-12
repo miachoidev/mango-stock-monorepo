@@ -149,30 +149,22 @@
 
 ```mermaid
 graph TB
-    subgraph Client["🖥️ 클라이언트 (Client)"]
-        NextJS["Next.js 15.5.2<br/>React 19.1.0<br/>TypeScript"]
+    subgraph Client["🖥️ 클라이언트"]
         Pages["주요 페이지<br/>• 주식 메인<br/>• 종목 상세<br/>• 관심 종목<br/>• AI 채팅<br/>• 매매"]
-        State["상태 관리<br/>• TanStack Query<br/>• Zustand"]
-        NextJS --> Pages
-        NextJS --> State
     end
 
-    subgraph API["🔌 API 레이어"]
-        Routes["Next.js API Routes<br/>• /api/adk<br/>• /api/adk/streaming<br/>• /api/kiwoom/login"]
-    end
-
-    subgraph Server["⚙️ 서버 (Server)"]
-        FastAPI["FastAPI<br/>Python 3.12+<br/>CORS Middleware"]
-        ADK["Google ADK Runner<br/>Agent Orchestration<br/>Session Management"]
+    subgraph Server["⚙️ 서버"]
+        FastAPI["FastAPI 서버"]
+        ADK["ADK Runner"]
         FastAPI --> ADK
     end
 
-    subgraph Agents["🤖 멀티 에이전트 시스템"]
-        Root["Root Agent<br/>메인 코디네이터"]
-        Stock["Stock Analyzer<br/>종목 분석"]
-        Sector["Sector Analyzer<br/>섹터 분석"]
-        Supply["Supply Demand Analyzer<br/>수급 분석"]
-        Volume["Volume Analyzer<br/>거래량 분석"]
+    subgraph Agents["🤖 멀티 에이전트"]
+        Root["Root Agent"]
+        Stock["Stock Analyzer"]
+        Sector["Sector Analyzer"]
+        Supply["Supply Demand Analyzer"]
+        Volume["Volume Analyzer"]
         
         Root --> Stock
         Root --> Sector
@@ -181,24 +173,16 @@ graph TB
     end
 
     subgraph External["🌐 외부 API"]
-        Kiwoom["키움증권 API<br/>REST API<br/>• 인증 토큰<br/>• 계좌 정보<br/>• 시세 데이터<br/>• 매매 주문<br/>• 차트 데이터"]
-        Gemini["Google Gemini<br/>LLM API<br/>• Gemini 2.5 Flash<br/>• 멀티 모달 처리"]
+        Kiwoom["키움증권 API"]
+        Gemini["Google Gemini"]
     end
 
-    Client -->|HTTP/SSE| API
-    API -->|HTTP/SSE| Server
+    Client --> Server
     ADK --> Agents
-    Stock --> Kiwoom
-    Stock --> Gemini
-    Sector --> Kiwoom
-    Sector --> Gemini
-    Supply --> Kiwoom
-    Supply --> Gemini
-    Volume --> Kiwoom
-    Volume --> Gemini
+    Agents --> Kiwoom
+    Agents --> Gemini
 
     style Client fill:#e1f5ff
-    style API fill:#fff4e1
     style Server fill:#ffe1f5
     style Agents fill:#e1ffe1
     style External fill:#f5e1ff
@@ -301,101 +285,49 @@ graph TB
 ```mermaid
 sequenceDiagram
     participant User as 👤 사용자
-    participant Client as 🖥️ 클라이언트<br/>(Next.js)
-    participant API as 🔌 API Route<br/>(Next.js)
-    participant Server as ⚙️ FastAPI<br/>서버
-    participant ADK as 🎯 ADK Runner
+    participant Client as 🖥️ 클라이언트
+    participant Server as ⚙️ 서버
     participant Root as 🧠 Root Agent
-    participant SubAgent as 🤖 서브 에이전트<br/>(예: Stock Analyzer)
+    participant SubAgent as 🤖 서브 에이전트
     participant Kiwoom as 📊 키움증권 API
     participant Gemini as 🤖 Google Gemini
 
-    User->>Client: 자연어 질문 입력
-    Client->>Client: React Query로 API 호출<br/>Zustand 상태 관리
-    Client->>API: HTTP/SSE 요청<br/>(/api/adk 또는 /api/adk/streaming)
-    API->>Server: 요청 전달
-    Server->>Server: 요청 검증 및 세션 관리
-    Server->>ADK: ADK Runner에 요청 전달
-    ADK->>Root: Root Agent에게 요청 전달
-    Root->>Root: 질문 분석
-    Root->>Kiwoom: 키움증권 API 토큰 발급
-    Kiwoom-->>Root: 인증 토큰 반환
-    Root->>SubAgent: 적절한 서브 에이전트 선택<br/>토큰 전달
-    SubAgent->>Kiwoom: 키움증권 API 호출<br/>(계좌 정보, 시세 데이터 등)
-    Kiwoom-->>SubAgent: 주식 데이터 반환
-    SubAgent->>Gemini: 수집된 데이터를 기반으로<br/>AI 분석 요청
-    Gemini-->>SubAgent: AI 분석 결과 반환
-    SubAgent-->>Root: 분석 결과 반환
-    Root-->>ADK: 통합 결과 반환
-    ADK-->>Server: 최종 결과 반환
-    Server-->>API: 응답 전송 (스트리밍 또는 일반)
-    API-->>Client: 응답 수신
-    Client->>Client: UI 업데이트<br/>(스트리밍 또는 일반 응답)
-    Client-->>User: 화면에 결과 표시
+    User->>Client: 질문 입력
+    Client->>Server: 요청 전송
+    Server->>Root: 질문 분석
+    Root->>Kiwoom: 토큰 발급
+    Kiwoom-->>Root: 토큰 반환
+    Root->>SubAgent: 에이전트 선택
+    SubAgent->>Kiwoom: 데이터 수집
+    Kiwoom-->>SubAgent: 데이터 반환
+    SubAgent->>Gemini: AI 분석
+    Gemini-->>SubAgent: 분석 결과
+    SubAgent-->>Root: 결과 반환
+    Root-->>Server: 통합 결과
+    Server-->>Client: 응답 전송
+    Client-->>User: 결과 표시
 ```
 
-### 에이전트 구조 상세
+### 에이전트 구조
 
 ```mermaid
-graph LR
-    subgraph RootAgent["Root Agent (메인 코디네이터)"]
-        Root["질문 분석<br/>토큰 발급<br/>에이전트 선택"]
-    end
+graph TB
+    Root["Root Agent<br/>메인 코디네이터"]
+    Stock["Stock Analyzer<br/>종목 분석"]
+    Sector["Sector Analyzer<br/>섹터 분석"]
+    Supply["Supply Demand Analyzer<br/>수급 분석"]
+    Volume["Volume Analyzer<br/>거래량 분석"]
+    
+    Root --> Stock
+    Root --> Sector
+    Root --> Supply
+    Root --> Volume
 
-    subgraph StockAgent["Stock Analyzer Agent"]
-        Stock1["계좌 평가 현황"]
-        Stock2["주식 일봉 차트"]
-        Stock3["기관/외국인 매매"]
-        Stock4["프로그램 매매"]
-        Stock5["공매도 추이"]
-    end
-
-    subgraph SectorAgent["Sector Analyzer Agent"]
-        Sector1["업종별 강세/약세"]
-        Sector2["테마주 탐지"]
-        Sector3["섹터 로테이션"]
-    end
-
-    subgraph SupplyAgent["Supply Demand Analyzer Agent"]
-        Supply1["기관 투자자 동향"]
-        Supply2["외국인 투자자 동향"]
-        Supply3["프로그램 매매 추이"]
-    end
-
-    subgraph VolumeAgent["Volume Analyzer Agent"]
-        Volume1["거래량 급증 탐지"]
-        Volume2["급등/급락 분석"]
-        Volume3["모멘텀 지표"]
-    end
-
-    Root --> StockAgent
-    Root --> SectorAgent
-    Root --> SupplyAgent
-    Root --> VolumeAgent
-
-    StockAgent --> Stock1
-    StockAgent --> Stock2
-    StockAgent --> Stock3
-    StockAgent --> Stock4
-    StockAgent --> Stock5
-
-    SectorAgent --> Sector1
-    SectorAgent --> Sector2
-    SectorAgent --> Sector3
-
-    SupplyAgent --> Supply1
-    SupplyAgent --> Supply2
-    SupplyAgent --> Supply3
-
-    VolumeAgent --> Volume1
-    VolumeAgent --> Volume2
-    VolumeAgent --> Volume3
-
-    style RootAgent fill:#e1f5ff
-    style StockAgent fill:#ffe1f5
-    style SectorAgent fill:#fff4e1
-    style SupplyAgent fill:#e1ffe1
-    style VolumeAgent fill:#f5e1ff
+    style Root fill:#e1f5ff
+    style Stock fill:#ffe1f5
+    style Sector fill:#fff4e1
+    style Supply fill:#e1ffe1
+    style Volume fill:#f5e1ff
 ```
 
 ### 에이전트 협업 프로세스
