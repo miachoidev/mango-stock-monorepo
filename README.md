@@ -151,27 +151,27 @@
 graph TB
     subgraph Client["🖥️ 클라이언트"]
         Pages["주요 페이지<br/>• 주식 메인<br/>• 종목 상세<br/>• 관심 종목<br/>• AI 채팅<br/>• 매매"]
+    end
+
+    subgraph Server["⚙️ 서버"]
+        FastAPI["FastAPI 서버"]
         
-        subgraph Server["⚙️ 서버"]
-            FastAPI["FastAPI 서버"]
-            
-            subgraph ADK["🎯 ADK Runner"]
-                subgraph Agents["🤖 멀티 에이전트"]
-                    Root["Root Agent<br/>메인 코디네이터"]
-                    Stock["Stock Analyzer<br/>종목 분석<br/>• 계좌 평가 현황<br/>• 일봉 차트 분석<br/>• 기관/외국인 매매<br/>• 프로그램 매매<br/>• 공매도 추이"]
-                    Sector["Sector Analyzer<br/>섹터 분석<br/>• 업종별 강세/약세<br/>• 테마주 탐지<br/>• 섹터 로테이션"]
-                    Supply["Supply Demand Analyzer<br/>수급 분석<br/>• 기관 투자자 동향<br/>• 외국인 투자자 동향<br/>• 프로그램 매매 추이"]
-                    Volume["Volume Analyzer<br/>거래량 분석<br/>• 거래량 급증 탐지<br/>• 급등/급락 분석<br/>• 모멘텀 지표"]
-                    
-                    Root --> Stock
-                    Root --> Sector
-                    Root --> Supply
-                    Root --> Volume
-                end
+        subgraph ADK["🎯 ADK Runner"]
+            subgraph Agents["🤖 멀티 에이전트"]
+                Root["Root Agent<br/>메인 코디네이터"]
+                Stock["Stock Analyzer<br/>종목 분석<br/>• 계좌 평가 현황<br/>• 일봉 차트 분석<br/>• 기관/외국인 매매<br/>• 프로그램 매매<br/>• 공매도 추이"]
+                Sector["Sector Analyzer<br/>섹터 분석<br/>• 업종별 강세/약세<br/>• 테마주 탐지<br/>• 섹터 로테이션"]
+                Supply["Supply Demand Analyzer<br/>수급 분석<br/>• 기관 투자자 동향<br/>• 외국인 투자자 동향<br/>• 프로그램 매매 추이"]
+                Volume["Volume Analyzer<br/>거래량 분석<br/>• 거래량 급증 탐지<br/>• 급등/급락 분석<br/>• 모멘텀 지표"]
+                
+                Root --> Stock
+                Root --> Sector
+                Root --> Supply
+                Root --> Volume
             end
-            
-            FastAPI --> ADK
         end
+        
+        FastAPI --> ADK
     end
 
     subgraph External["🌐 외부 API"]
